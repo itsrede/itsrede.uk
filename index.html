@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ItsRede | Official Website</title>
+    <title>Fred | Official Website</title> <!-- Matching how Google knows you -->
     <link rel="icon" type="image/png" href="favicon.png">
     
     <style>
@@ -12,9 +12,7 @@
             padding: 50px 20px;
             font-family: 'Helvetica', sans-serif;
             text-align: center;
-            color: #222; /* Dark text for the white background */
-            line-height: 1.6;
-            /* White background with a moving red gradient overlay */
+            color: #222;
             background: linear-gradient(-45deg, #ffffff, #fff0f0, #ffffff, #ffebeb);
             background-size: 400% 400%;
             animation: gradient 10s ease infinite;
@@ -27,13 +25,24 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* Top Left Shop Link */
+        .shop-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: "Comic Sans MS", cursive;
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: #222;
+            transition: 0.3s;
+        }
+        .shop-link:hover { color: red; transform: scale(1.1); }
+
         .container { max-width: 800px; margin: auto; }
 
-        /* Comic Sans + Rainbow Title */
         h1 { 
             font-family: "Comic Sans MS", "Comic Sans", cursive;
             font-size: 4rem; 
-            letter-spacing: 2px; 
             margin-bottom: 10px;
             background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
             -webkit-background-clip: text;
@@ -46,51 +55,83 @@
             to { background-position: 200% center; }
         }
 
-        .subtitle { color: #555; font-size: 1.2rem; margin-bottom: 40px; font-weight: bold; }
+        .subtitle { color: #555; font-size: 1rem; margin-bottom: 30px; }
         
-        .label-box { 
+        .info-box { 
             border: 2px solid #ff0000; 
-            padding: 25px; 
+            padding: 20px; 
             border-radius: 15px; 
-            background: rgba(255, 255, 255, 0.8); 
-            margin-bottom: 30px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.9); 
+            margin: 20px auto;
+            max-width: 500px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .links-section {
+            margin-top: 40px;
+            font-family: "Comic Sans MS", cursive;
         }
 
         .btn { 
             color: red; 
             text-decoration: none; 
             border: 2px solid red; 
-            padding: 12px 25px; 
+            padding: 10px 20px; 
             border-radius: 5px; 
             transition: 0.3s; 
             display: inline-block;
             font-weight: bold;
             background: white;
-            margin: 5px;
+            margin: 10px;
         }
-        .btn:hover { background-color: red; color: white; transform: scale(1.05); }
-        
-        .avatar { width: 150px; border-radius: 20px; margin-bottom: 20px; border: 3px solid red; }
+        .btn:hover { background-color: red; color: white; }
+
+        .social-links a {
+            color: #444;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.2rem;
+        }
+        .social-links a:hover { color: red; }
+
+        .avatar { width: 120px; border-radius: 15px; border: 3px solid red; margin-bottom: 10px; }
     </style>
 </head>
 <body>
+
+    <!-- Shop Link (Top Left) -->
+    <a href="https://itsrede-shop.fourthwall.com/" class="shop-link">Shop</a>
+
     <div class="container">
-        <!-- Using your stickman icon as the header image -->
-        <img src="favicon.png" class="avatar" alt="ItsRede">
+        <img src="favicon.png" class="avatar" alt="Fred">
 
         <h1>ITSREDE</h1>
         <p class="subtitle">Musical Artist • Author • Producer</p>
 
-        <div class="label-box">
-            <h3 style="color:red; margin-top:0;">Rede Records</h3>
-            <p>Independent distribution and creative collective managing original breakcore releases and digital assets.</p>
+        <!-- Info / Rede Records Section -->
+        <div class="info-box">
+            <h3 style="color:red; margin:0 0 10px 0;">Rede Records</h3>
+            <p style="font-size: 0.9rem; margin:0;">
+                Independent distribution and creative collective managing original breakcore releases and digital assets.
+            </p>
         </div>
 
-        <div class="section">
+        <div class="navigation">
             <a href="/aboutme" class="btn">About My Journey</a>
             <a href="mailto:admin@itsrede.uk" class="btn">Contact / Inquiries</a>
         </div>
-    </div>
-</body>
-</html>
+
+     <!-- Links Section -->
+        <div class="links-section">
+            <h2>[Links]</h2>
+            <div class="social-links">
+                <a href="https://www.youtube.com/@itsredeofficial">YouTube</a>
+                <a href="https://www.roblox.com/users/1301576775/profile">Roblox</a>
+                <a href="https://www.imdb.com/name/nm17546364/">IMDb</a>
+                <a href="https://music.apple.com/us/artist/itsrede/1743606622">Apple Music</a>
+                <a href="https://open.spotify.com/artist/2IeU0rS7O4fVlF4ZlK6vRE">Spotify</a>
+            </div>
+            
+            <h2 style="margin-top:30px;">R-Records</h2>
+            <p style="color:#666;">Official distribution and catalog management.</p>
+        </div>

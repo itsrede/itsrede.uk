@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITSREDE | Official</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 50px 20px;
+            font-family: 'Helvetica', sans-serif;
+            text-align: center;
+            color: #222; /* Dark text for the white background */
+            line-height: 1.6;
+            /* White background with a moving red gradient overlay */
+            background: linear-gradient(-45deg, #ffffff, #fff0f0, #ffffff, #ffebeb);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container { max-width: 800px; margin: auto; }
+
+        /* Comic Sans + Rainbow Title */
+        h1 { 
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+            font-size: 4rem; 
+            letter-spacing: 2px; 
+            margin-bottom: 10px;
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: rainbow 3s linear infinite;
+        }
+
+        @keyframes rainbow {
+            to { background-position: 200% center; }
+        }
+
+        .subtitle { color: #555; font-size: 1.2rem; margin-bottom: 40px; font-weight: bold; }
+        
+        .label-box { 
+            border: 2px solid #ff0000; 
+            padding: 25px; 
+            border-radius: 15px; 
+            background: rgba(255, 255, 255, 0.8); 
+            margin-bottom: 30px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn { 
+            color: red; 
+            text-decoration: none; 
+            border: 2px solid red; 
+            padding: 12px 25px; 
+            border-radius: 5px; 
+            transition: 0.3s; 
+            display: inline-block;
+            font-weight: bold;
+            background: white;
+            margin: 5px;
+        }
+        .btn:hover { background-color: red; color: white; transform: scale(1.05); }
+        
+        .avatar { width: 150px; border-radius: 20px; margin-bottom: 20px; border: 3px solid red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Using your stickman icon as the header image -->
+        <img src="favicon.png" class="avatar" alt="ItsRede">
+
+        <h1>ITSREDE</h1>
+        <p class="subtitle">Musical Artist • Author • Producer</p>
+
+        <div class="label-box">
+            <h3 style="color:red; margin-top:0;">Rede Records</h3>
+            <p>Independent distribution and creative collective managing original breakcore releases and digital assets.</p>
+        </div>
+
+        <div class="section">
+            <a href="/aboutme" class="btn">About My Journey</a>
+            <a href="mailto:admin@itsrede.uk" class="btn">Contact / Inquiries</a>
+        </div>
+    </div>
+</body>
+</html>

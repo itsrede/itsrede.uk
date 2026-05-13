@@ -1,1 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ItsRede DVD</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #logo {
+            position: absolute;
+            width: 100px; /* Adjust size if needed */
+            height: auto;
+            image-rendering: pixelated; /* Keeps your mascot looking sharp */
+        }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            z-index: 5;
+            font-size: 20px;
+            text-shadow: 2px 2px #000;
+        }
+        #start-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            cursor: pointer;
+        }
+        .flash {
+            color: #ff0000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
 
+    <div id="start-overlay">
+        <h1>itsrede.uk/dvd</h1>
+        <p>Click anywhere to start</p>
+    </div>
+
+    <div id="ui">
+        CORNER HITS: <span id="counter">0</span>
+    </div>
+
+    <!-- Music Player -->
+    <audio id="bgm" loop>
+        <source src="https://www.chosic.com/wp-content/uploads/2020/06/Clair-de-Lune.mp3" type="audio/mpeg">
+    </audio>
+
+    <img src="/favicon.png" id="logo" alt="Rede Mascot">
+
+    <script>
+        const logo = document.getElementById('logo');
+        const counterDisplay = document.getElementById('counter');
+        const overlay = document.getElementById('start-overlay');
+        const audio = document.getElementById('bgm');
+
+        let x = Math.random() * (window.innerWidth - 100);
+        let y = Math.random() * (window.innerHeight - 100);
+        let xSpeed = 3;
+        let ySpeed = 3;
+        let score = 0;
+
+        overlay.addEventListener('click', () => {
+            overlay.style.display = 'none';
+            audio.play();
+            animate();
+        });
+
+        function animate() {
+            x += xSpeed;
+            y += ySpeed;
+
+            let hitX = false;
+            let hitY = false;
+
+            // Bounce off left/right
+            if (x + logo.clientWidth >= window.innerWidth || x <= 0) {
+                xSpeed *= -1;
+                hitX = true;
+            }
+
+            // Bounce off top/bottom
+            if (y + logo.clientHeight >= window.innerHeight || y <= 0) {
+                ySpeed *= -1;
+                hitY = true;
+            }
+
+            // Check for perfect corner hit
+            if (hitX && hitY) {
+                score++;
+                counterDisplay.innerText = score;
+                counterDisplay.classList.add('flash');
+                setTimeout(() => counterDisplay.classList.remove('flash'), 1000);
+            }
+
+            logo.style.left = x + 'px';
+            logo.style.top = y + 'px';
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            x = Math.min(x, window.innerWidth - logo.clientWidth);
+            y = Math.min(y, window.innerHeight - logo.clientHeight);
+        });
+    </script>
+</body>
+</html>

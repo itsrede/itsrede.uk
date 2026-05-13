@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
     <!-- Primary Meta Tags -->
-<meta name="title" content="ItsRede | Official Website">
-<meta name="description" content="Official hub for Fred (ItsRede) — Musical Artist, Author, and Producer. Explore breakcore tracks, books, and official merchandise.">
+    <meta name="title" content="ItsRede | Official Website">
+    <meta name="description" content="Official hub for Fred (ItsRede) — Musical Artist, Author, and Producer. Explore breakcore tracks, books, and official merchandise.">
 
-<!-- Open Graph / Discord & Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://itsrede.uk/">
-<meta property="og:title" content="ItsRede - Welcome to my Official Site!">
-<meta property="og:description" content="Musical Artist, Author, and YouTuber. Home of ItsRede.">
-<meta property="og:image" content="https://itsrede.uk/favicon.png"> <!-- This shows your stickman OC -->
+    <!-- Open Graph / Discord & Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://itsrede.uk/">
+    <meta property="og:title" content="ItsRede - Welcome to my Official Site!">
+    <meta property="og:description" content="Musical Artist, Author, and YouTuber. Home of ItsRede.">
+    <meta property="og:image" content="https://itsrede.uk/favicon.png"> 
 
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://itsrede.uk/">
-<meta property="twitter:title" content="ItsRede | Official Website">
-<meta property="twitter:description" content="Musical Artist, Author, and Producer. Home of Rede Records.">
-<meta property="twitter:image" content="https://itsrede.uk/favicon.png">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://itsrede.uk/">
+    <meta property="twitter:title" content="ItsRede | Official Website">
+    <meta property="twitter:description" content="Musical Artist, Author, and Producer. Home of Rede Records.">
+    <meta property="twitter:image" content="https://itsrede.uk/favicon.png">
 
-<!-- Theme Color for Discord Sidebar -->
-<meta name="theme-color" content="#FF0000">
+    <!-- Theme Color for Discord Sidebar -->
+    <meta name="theme-color" content="#FF0000">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ItsRede | Official Website</title> <!-- Matching how Google knows you -->
+    <title>ItsRede | Official Website</title>
     <link rel="icon" type="image/png" href="favicon.png">
     
     <style>
@@ -45,18 +45,23 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Top Left Shop Link */
-        .shop-link {
+        /* Nav Container for Top Left Links */
+        .top-nav {
             position: absolute;
             top: 20px;
             left: 20px;
+            display: flex;
+            gap: 20px; /* Space between Shop and DVD */
+        }
+
+        .nav-link {
             font-family: "Comic Sans MS", cursive;
             font-size: 1.5rem;
             text-decoration: none;
             color: #222;
             transition: 0.3s;
         }
-        .shop-link:hover { color: red; transform: scale(1.1); }
+        .nav-link:hover { color: red; transform: scale(1.1); }
 
         .container { max-width: 800px; margin: auto; }
 
@@ -119,8 +124,11 @@
 </head>
 <body>
 
-    <!-- Shop Link (Top Left) -->
-    <a href="https://itsrede-shop.fourthwall.com/" class="shop-link">Shop</a>
+    <!-- Top Left Links -->
+    <div class="top-nav">
+        <a href="https://itsrede-shop.fourthwall.com/" class="nav-link">Shop</a>
+        <a href="/dvd" class="nav-link">DVD</a>
+    </div>
 
     <div class="container">
         <img src="favicon.png" class="avatar" alt="Fred">
@@ -141,7 +149,7 @@
             <a href="mailto:admin@itsrede.uk" class="btn">Contact / Inquiries</a>
         </div>
 
-     <!-- Links Section -->
+        <!-- Links Section -->
         <div class="links-section">
             <h2>[Links]</h2>
             <div class="social-links">
@@ -155,3 +163,6 @@
             <h2 style="margin-top:30px;">ItsRede™</h2>
             <p style="color:#666;">All rights reserved..</p>
         </div>
+    </div>
+</body>
+</html>

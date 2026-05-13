@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ItsRede Clicker</title>
+    <title>ItsRede Clicker Game</title>
     <style>
         :root { --rede-red: #ff0000; --rede-blue: #4d94ff; }
         body { margin: 0; font-family: 'Comic Sans MS', cursive; overflow: hidden; height: 100vh; background: #000; color: white; user-select: none; }
 
-        /* Moving Diagonal Background from image_da6700.png */
+        /* Moving Diagonal Background as seen in image_d9feba.png */
         .game-area {
             flex-grow: 1; height: 100vh;
             background: repeating-linear-gradient(45deg, var(--rede-red), var(--rede-red) 60px, var(--rede-blue) 60px, var(--rede-blue) 120px);
@@ -18,77 +18,77 @@
         @keyframes moveBg { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
 
         /* HUD & Stats */
-        .header { position: absolute; top: 0; width: 100%; background: rgba(0,0,0,0.9); padding: 10px; text-align: center; border-bottom: 4px solid #222; z-index: 100; }
-        #score { font-size: 48px; margin: 0; }
-        #rps { color: var(--rede-red); font-size: 14px; font-weight: bold; }
+        .header { position: absolute; top: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 10px; text-align: center; border-bottom: 4px solid #000; z-index: 100; }
+        #score { font-size: 56px; margin: 0; font-weight: bold; text-shadow: 3px 3px #000; }
+        #rps { color: var(--rede-red); font-size: 16px; font-weight: bold; text-shadow: 1px 1px #000; }
 
-        /* Left Side Menu (Styled per image_da6700.png) */
+        /* Left Side Menu */
         .left-menu { position: absolute; left: 20px; top: 120px; display: flex; flex-direction: column; gap: 15px; z-index: 50; }
         .menu-btn { 
             background: white; color: black; border: 4px solid black; padding: 12px 20px; 
             border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; 
-            display: flex; align-items: center; gap: 10px; font-size: 18px;
+            display: flex; align-items: center; gap: 10px; font-size: 18px; box-shadow: 4px 4px 0px #000;
         }
-        .menu-btn:hover { transform: scale(1.1); background: var(--rede-red); color: white; }
+        .menu-btn:hover { transform: scale(1.05); background: var(--rede-red); color: white; }
 
-        /* Scrolling Shop System */
+        /* Shop System (High Contrast Fix) */
         .shop {
             position: absolute; right: 20px; top: 110px; bottom: 30px; width: 280px;
-            background: rgba(0,0,0,0.85); border: 3px solid white; border-radius: 15px;
-            padding: 15px; overflow-y: auto; z-index: 50; scrollbar-width: thin;
+            background: rgba(0,0,0,0.9); border: 3px solid white; border-radius: 15px;
+            padding: 15px; overflow-y: auto; z-index: 50;
         }
-        .shop::-webkit-scrollbar { width: 6px; }
-        .shop::-webkit-scrollbar-thumb { background: white; border-radius: 10px; }
-
         .shop-item {
-            background: #1a1a1a; border: 2px solid white; border-radius: 8px;
-            padding: 10px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
+            background: #111; border: 2px solid #444; border-radius: 8px;
+            padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
         }
-        .shop-item:hover { background: #333; transform: translateX(-5px); }
-        .shop-item.locked { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
-        .shop-item h4 { margin: 0; font-size: 14px; color: var(--rede-blue); }
-        .shop-item p { margin: 5px 0 0; font-size: 12px; color: #ffeb3b; }
+        .shop-item:hover { background: #222; border-color: white; transform: translateX(-5px); }
+        .shop-item.locked { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
+        .shop-item h4 { margin: 0; font-size: 16px; color: var(--rede-blue); text-transform: uppercase; }
+        .shop-item p { margin: 5px 0 0; font-size: 13px; color: #ffeb3b; font-weight: bold; }
 
-        /* Mascot */
-        #clicker-btn { width: 240px; cursor: pointer; z-index: 10; transition: transform 0.05s; }
-        #clicker-btn:active { transform: scale(0.9); }
+        /* Fixed Mascot Image */
+        #clicker-btn { 
+            width: 260px; height: 260px; cursor: pointer; z-index: 10; 
+            transition: transform 0.05s, filter 0.1s;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
+        }
+        #clicker-btn:active { transform: scale(0.92); filter: brightness(1.2) drop-shadow(0 0 20px #fff); }
 
-        /* Save Tag */
-        .save-status { position: absolute; bottom: 20px; left: 20px; font-size: 22px; text-shadow: 2px 2px #000; }
+        /* Save Status per your sketch */
+        .save-status { position: absolute; bottom: 20px; left: 20px; font-size: 24px; font-weight: bold; text-shadow: 2px 2px #000; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div id="score">0</div>
-        <div id="rps">REDE PER SECOND: 0</div>
+        <div id="rps">REDE PER SECOND: 0.0</div>
     </div>
 
     <div class="game-area">
         <div class="left-menu">
             <div class="menu-btn">Background 🎨</div>
-            <div class="menu-btn" onclick="alert('Use Code: REDE2026')">Codes 🔑</div>
+            <div class="menu-btn" onclick="alert('REDE2026')">Codes 🔑</div>
             <div class="menu-btn">Music (WIP) 🎵</div>
         </div>
 
-        <!-- Reference to mascot mentioned in image_da6700.png -->
+        <!-- Corrected Path for your Mascot -->
         <img src="favicon.png" id="clicker-btn" alt="Rede Mascot">
 
         <div class="shop" id="shop-container">
-            <h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>
+            <h3 style="text-align:center; margin-top:0; letter-spacing: 2px;">REDE SHOP 🛒</h3>
         </div>
 
         <div class="save-status">Save progress 💾</div>
     </div>
 
     <script>
-        // Core Variables
         let score = parseFloat(localStorage.getItem('r_score')) || 0;
         let pwr = parseInt(localStorage.getItem('r_pwr')) || 1;
         let rps = parseFloat(localStorage.getItem('r_rps')) || 0;
         let lastSafeScore = score;
 
-        // 40 Unique Career Items
+        // The "Secret 40" Career Path
         const names = [
             "Mouse Click", "Double Tap", "Shorts Bot", "Gumball Clip", "Breakcore Loop", 
             "PC Upgrade", "Rede Records", "Viral Hook", "King's Crown", "Pro Studio",
@@ -107,19 +107,18 @@
             items.push({
                 name: names[i],
                 type: i % 3 === 0 ? "click" : "rps",
-                cost: Math.floor(15 * Math.pow(1.5, i)),
-                boost: Math.floor(1 * Math.pow(1.4, i)),
+                cost: Math.floor(15 * Math.pow(1.55, i)),
+                boost: Math.floor(1 * Math.pow(1.45, i)),
                 emoji: emojis[i]
             });
         }
 
         function renderShop() {
             const container = document.getElementById('shop-container');
-            container.innerHTML = '<h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>';
+            container.innerHTML = '<h3 style="text-align:center; margin-top:0; letter-spacing: 2px;">REDE SHOP 🛒</h3>';
             
             items.forEach((item, index) => {
-                // Progression Logic: Only show if they have 70% of the cost or it's the start
-                const canSee = score >= (item.cost * 0.7) || index < 3;
+                const canSee = score >= (item.cost * 0.75) || index < 3;
                 if (canSee) {
                     const btn = document.createElement('div');
                     const affordable = score >= item.cost;
@@ -140,7 +139,7 @@
                 score -= item.cost;
                 if (item.type === 'click') pwr += item.boost;
                 else rps += item.boost;
-                item.cost *= 1.3; 
+                item.cost *= 1.35; 
                 save();
             }
         }
@@ -154,12 +153,11 @@
             renderShop();
         }
 
-        // Anti-Cheat Loop
+        // 🛡️ ANTI-CHEAT: No larpers allowed!
         setInterval(() => {
-            // If score jumps more than 2 million in 100ms, it's likely a console cheat
-            if (score > lastSafeScore + 2000000) {
+            if (score > lastSafeScore + 3000000) {
                 score = parseFloat(localStorage.getItem('r_score')) || 0;
-                alert("Anti-Cheat: Resetting to last legitimate save!");
+                alert("Anti-Cheat: Integrity failure. Resetting!");
             }
             score += rps / 10;
             save();
@@ -171,10 +169,7 @@
             save();
         };
 
-        // Extra Anti-Cheat: Disable Right Click and F12
         document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = (e) => { if(e.keyCode == 123) return false; };
-
         renderShop();
         save();
     </script>

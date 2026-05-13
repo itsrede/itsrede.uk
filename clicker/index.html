@@ -8,7 +8,7 @@
         :root { --rede-red: #ff0000; --rede-blue: #4d94ff; }
         body { margin: 0; font-family: 'Comic Sans MS', cursive; overflow: hidden; height: 100vh; background: #000; color: white; user-select: none; }
 
-        /* Moving Diagonal Background as seen in image_d9feba.png */
+        /* Moving Background */
         .game-area {
             flex-grow: 1; height: 100vh;
             background: repeating-linear-gradient(45deg, var(--rede-red), var(--rede-red) 60px, var(--rede-blue) 60px, var(--rede-blue) 120px);
@@ -17,10 +17,17 @@
         }
         @keyframes moveBg { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
 
-        /* HUD & Stats */
+        /* HUD & Top Bar */
         .header { position: absolute; top: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 10px; text-align: center; border-bottom: 4px solid #000; z-index: 100; }
         #score { font-size: 56px; margin: 0; font-weight: bold; text-shadow: 3px 3px #000; }
-        #rps { color: var(--rede-red); font-size: 16px; font-weight: bold; text-shadow: 1px 1px #000; }
+        #rps { color: var(--rede-red); font-size: 16px; font-weight: bold; }
+
+        /* Progress Note & Checkmark (as seen in image_d9ef79.png) */
+        .progression-note {
+            position: absolute; top: 15px; left: 150px; display: flex; align-items: center; gap: 10px; z-index: 101;
+        }
+        .checkmark { font-size: 40px; color: #a286ff; filter: drop-shadow(2px 2px 2px #000); }
+        .note-text { font-size: 12px; color: #fff; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 5px; max-width: 150px; }
 
         /* Left Side Menu */
         .left-menu { position: absolute; left: 20px; top: 120px; display: flex; flex-direction: column; gap: 15px; z-index: 50; }
@@ -31,7 +38,7 @@
         }
         .menu-btn:hover { transform: scale(1.05); background: var(--rede-red); color: white; }
 
-        /* Shop System (High Contrast Fix) */
+        /* Shop System */
         .shop {
             position: absolute; right: 20px; top: 110px; bottom: 30px; width: 280px;
             background: rgba(0,0,0,0.9); border: 3px solid white; border-radius: 15px;
@@ -39,22 +46,23 @@
         }
         .shop-item {
             background: #111; border: 2px solid #444; border-radius: 8px;
-            padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
+            padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.1s;
         }
-        .shop-item:hover { background: #222; border-color: white; transform: translateX(-5px); }
+        .shop-item:hover:not(.locked) { background: #222; border-color: white; transform: translateX(-5px); }
         .shop-item.locked { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
-        .shop-item h4 { margin: 0; font-size: 16px; color: var(--rede-blue); text-transform: uppercase; }
-        .shop-item p { margin: 5px 0 0; font-size: 13px; color: #ffeb3b; font-weight: bold; }
+        .shop-item h4 { margin: 0; font-size: 16px; color: var(--rede-blue); text-transform: uppercase; pointer-events: none; }
+        .shop-item p { margin: 5px 0 0; font-size: 13px; color: #ffeb3b; font-weight: bold; pointer-events: none; }
 
-        /* Fixed Mascot Image */
+        /* Mascot Icon Fix */
         #clicker-btn { 
             width: 260px; height: 260px; cursor: pointer; z-index: 10; 
-            transition: transform 0.05s, filter 0.1s;
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
+            transition: transform 0.05s;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+            object-fit: contain;
         }
-        #clicker-btn:active { transform: scale(0.92); filter: brightness(1.2) drop-shadow(0 0 20px #fff); }
+        #clicker-btn:active { transform: scale(0.92); }
 
-        /* Save Status per your sketch */
+        /* Save Status */
         .save-status { position: absolute; bottom: 20px; left: 20px; font-size: 24px; font-weight: bold; text-shadow: 2px 2px #000; }
     </style>
 </head>
@@ -63,20 +71,24 @@
     <div class="header">
         <div id="score">0</div>
         <div id="rps">REDE PER SECOND: 0.0</div>
+        <div class="progression-note">
+            <span class="checkmark">✔</span>
+            <span class="note-text">Keep clicking! New upgrades appear as you get richer.</span>
+        </div>
     </div>
 
     <div class="game-area">
         <div class="left-menu">
             <div class="menu-btn">Background 🎨</div>
-            <div class="menu-btn" onclick="alert('REDE2026')">Codes 🔑</div>
+            <div class="menu-btn" onclick="alert('CODE: REDE2026')">Codes 🔑</div>
             <div class="menu-btn">Music (WIP) 🎵</div>
         </div>
 
-        <!-- Corrected Path for your Mascot -->
+        <!-- Reference to the mascot stickman with red hat -->
         <img src="favicon.png" id="clicker-btn" alt="Rede Mascot">
 
         <div class="shop" id="shop-container">
-            <h3 style="text-align:center; margin-top:0; letter-spacing: 2px;">REDE SHOP 🛒</h3>
+            <h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>
         </div>
 
         <div class="save-status">Save progress 💾</div>
@@ -88,7 +100,6 @@
         let rps = parseFloat(localStorage.getItem('r_rps')) || 0;
         let lastSafeScore = score;
 
-        // The "Secret 40" Career Path
         const names = [
             "Mouse Click", "Double Tap", "Shorts Bot", "Gumball Clip", "Breakcore Loop", 
             "PC Upgrade", "Rede Records", "Viral Hook", "King's Crown", "Pro Studio",
@@ -115,10 +126,10 @@
 
         function renderShop() {
             const container = document.getElementById('shop-container');
-            container.innerHTML = '<h3 style="text-align:center; margin-top:0; letter-spacing: 2px;">REDE SHOP 🛒</h3>';
+            container.innerHTML = '<h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>';
             
             items.forEach((item, index) => {
-                const canSee = score >= (item.cost * 0.75) || index < 3;
+                const canSee = score >= (item.cost * 0.70) || index < 3;
                 if (canSee) {
                     const btn = document.createElement('div');
                     const affordable = score >= item.cost;
@@ -127,7 +138,11 @@
                         <h4>${item.emoji} ${item.name}</h4>
                         <p>Cost: ${Math.floor(item.cost).toLocaleString()} | +${item.boost} ${item.type.toUpperCase()}</p>
                     `;
-                    if (affordable) btn.onclick = () => buyItem(index);
+                    // Fixed the click handler to ensure buying works properly
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        buyItem(index);
+                    });
                     container.appendChild(btn);
                 }
             });
@@ -141,6 +156,7 @@
                 else rps += item.boost;
                 item.cost *= 1.35; 
                 save();
+                renderShop(); // Instant refresh after purchase
             }
         }
 
@@ -150,11 +166,11 @@
             localStorage.setItem('r_rps', rps);
             document.getElementById('score').innerText = Math.floor(score).toLocaleString();
             document.getElementById('rps').innerText = `REDE PER SECOND: ${rps.toFixed(1)}`;
-            renderShop();
         }
 
-        // 🛡️ ANTI-CHEAT: No larpers allowed!
+        // Main Loop
         setInterval(() => {
+            // Anti-Cheat Check
             if (score > lastSafeScore + 3000000) {
                 score = parseFloat(localStorage.getItem('r_score')) || 0;
                 alert("Anti-Cheat: Integrity failure. Resetting!");
@@ -163,6 +179,9 @@
             save();
             lastSafeScore = score;
         }, 100);
+
+        // Separate Shop Refresh to prevent click interference
+        setInterval(renderShop, 1000);
 
         document.getElementById('clicker-btn').onclick = () => {
             score += pwr;

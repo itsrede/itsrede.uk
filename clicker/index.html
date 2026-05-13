@@ -5,269 +5,178 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ItsRede Clicker</title>
     <style>
-        :root {
-            --rede-red: #ff0000;
-            --rede-blue: #4d94ff;
-        }
+        :root { --rede-red: #ff0000; --rede-blue: #4d94ff; }
+        body { margin: 0; font-family: 'Comic Sans MS', cursive; overflow: hidden; height: 100vh; background: #000; color: white; user-select: none; }
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            user-select: none;
-            color: white;
-        }
-
-        /* Moving Diagonal Background from image_db483a.png */
+        /* Moving Diagonal Background from image_da6700.png */
         .game-area {
-            flex-grow: 1;
-            background: repeating-linear-gradient(
-                45deg,
-                var(--rede-red),
-                var(--rede-red) 60px,
-                var(--rede-blue) 60px,
-                var(--rede-blue) 120px
-            );
-            background-size: 200% 200%;
-            animation: moveBg 15s linear infinite;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-grow: 1; height: 100vh;
+            background: repeating-linear-gradient(45deg, var(--rede-red), var(--rede-red) 60px, var(--rede-blue) 60px, var(--rede-blue) 120px);
+            background-size: 200% 200%; animation: moveBg 15s linear infinite;
+            position: relative; display: flex; justify-content: center; align-items: center;
         }
+        @keyframes moveBg { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
 
-        @keyframes moveBg {
-            0% { background-position: 0 0; }
-            100% { background-position: 100% 100%; }
-        }
+        /* HUD & Stats */
+        .header { position: absolute; top: 0; width: 100%; background: rgba(0,0,0,0.9); padding: 10px; text-align: center; border-bottom: 4px solid #222; z-index: 100; }
+        #score { font-size: 48px; margin: 0; }
+        #rps { color: var(--rede-red); font-size: 14px; font-weight: bold; }
 
-        /* Top HUD */
-        .header {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 10px;
-            text-align: center;
-            border-bottom: 4px solid #333;
-            z-index: 20;
+        /* Left Side Menu (Styled per image_da6700.png) */
+        .left-menu { position: absolute; left: 20px; top: 120px; display: flex; flex-direction: column; gap: 15px; z-index: 50; }
+        .menu-btn { 
+            background: white; color: black; border: 4px solid black; padding: 12px 20px; 
+            border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; 
+            display: flex; align-items: center; gap: 10px; font-size: 18px;
         }
-        #score { font-size: 42px; font-weight: bold; margin: 0; }
-        #rps { font-size: 16px; color: var(--rede-red); text-transform: uppercase; letter-spacing: 1px; }
+        .menu-btn:hover { transform: scale(1.1); background: var(--rede-red); color: white; }
 
-        /* Left Side Labels from image_db483a.png */
-        .left-labels {
-            position: absolute;
-            left: 30px;
-            top: 100px;
-            display: flex;
-            flex-direction: column;
-            gap: 150px;
-            z-index: 10;
+        /* Scrolling Shop System */
+        .shop {
+            position: absolute; right: 20px; top: 110px; bottom: 30px; width: 280px;
+            background: rgba(0,0,0,0.85); border: 3px solid white; border-radius: 15px;
+            padding: 15px; overflow-y: auto; z-index: 50; scrollbar-width: thin;
         }
-        .label-text {
-            font-size: 48px;
-            font-weight: bold;
-            text-shadow: 4px 4px 0px #000;
-            opacity: 0.8;
-        }
+        .shop::-webkit-scrollbar { width: 6px; }
+        .shop::-webkit-scrollbar-thumb { background: white; border-radius: 10px; }
 
-        /* Center Clicker */
-        .clicker-container {
-            position: relative;
-            z-index: 5;
-            animation: bounce 2s infinite ease-in-out;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        #clicker-btn {
-            width: 250px;
-            height: auto;
-            cursor: pointer;
-            filter: drop-shadow(0 0 20px rgba(255,255,255,0.5));
-            transition: 0.1s;
-        }
-        .spin { animation: spinClick 0.5s ease-out; }
-        @keyframes spinClick {
-            0% { transform: rotate(0deg) scale(0.8); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
-
-        /* Right Scrollable Shop */
-        .shop-container {
-            position: absolute;
-            right: 20px;
-            top: 80px;
-            bottom: 20px;
-            width: 220px;
-            background: rgba(0,0,0,0.7);
-            border: 4px solid white;
-            border-radius: 15px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            overflow-y: auto;
-            z-index: 30;
-        }
-
-        /* Gradient Moving Buttons */
         .shop-item {
-            background: linear-gradient(270deg, #ff0000, #000, #4d94ff);
-            background-size: 400% 400%;
-            animation: gradMove 3s infinite;
-            border: 2px solid white;
-            padding: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: center;
-            transition: transform 0.2s;
+            background: #1a1a1a; border: 2px solid white; border-radius: 8px;
+            padding: 10px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
         }
-        @keyframes gradMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .shop-item:hover { transform: scale(1.05); }
-        .shop-item h4 { margin: 0; font-size: 14px; }
-        .shop-item p { margin: 5px 0 0; font-size: 12px; color: #ffeb3b; font-weight: bold; }
+        .shop-item:hover { background: #333; transform: translateX(-5px); }
+        .shop-item.locked { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
+        .shop-item h4 { margin: 0; font-size: 14px; color: var(--rede-blue); }
+        .shop-item p { margin: 5px 0 0; font-size: 12px; color: #ffeb3b; }
 
-        /* Floating Points */
-        .floating-point {
-            position: absolute;
-            font-size: 30px;
-            font-weight: bold;
-            pointer-events: none;
-            animation: floatUp 0.8s forwards;
-            text-shadow: 2px 2px #000;
-        }
-        @keyframes floatUp {
-            to { transform: translateY(-100px); opacity: 0; }
-        }
+        /* Mascot */
+        #clicker-btn { width: 240px; cursor: pointer; z-index: 10; transition: transform 0.05s; }
+        #clicker-btn:active { transform: scale(0.9); }
+
+        /* Save Tag */
+        .save-status { position: absolute; bottom: 20px; left: 20px; font-size: 22px; text-shadow: 2px 2px #000; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div id="score">0</div>
-        <div id="rps">Rede per second: 0</div>
+        <div id="rps">REDE PER SECOND: 0</div>
     </div>
 
     <div class="game-area">
-        <div class="left-labels">
-            <div class="label-text">Background 🎨</div>
-            <div class="label-text" onclick="alert('Enter Code: REDE2026')">Codes 🔑</div>
-            <div class="label-text">Music (WIP) 🎵</div>
+        <div class="left-menu">
+            <div class="menu-btn">Background 🎨</div>
+            <div class="menu-btn" onclick="alert('Use Code: REDE2026')">Codes 🔑</div>
+            <div class="menu-btn">Music (WIP) 🎵</div>
         </div>
 
-        <div class="clicker-container">
-            <img src="/favicon.png" id="clicker-btn" alt="Rede Mascot">
+        <!-- Reference to mascot mentioned in image_da6700.png -->
+        <img src="favicon.png" id="clicker-btn" alt="Rede Mascot">
+
+        <div class="shop" id="shop-container">
+            <h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>
         </div>
 
-        <div class="shop-container">
-            <h3 style="text-align:center; margin-top:0;">SHOP 🛒</h3>
-            
-            <div class="shop-item" onclick="buy('click')">
-                <h4>🖱️ Super Click</h4>
-                <p id="cost-click">Cost: 15</p>
-            </div>
-
-            <div class="shop-item" onclick="buy('shorts')">
-                <h4>🎥 Shorts Bot</h4>
-                <p id="cost-shorts">Cost: 100</p>
-            </div>
-
-            <div class="shop-item" onclick="buy('breakcore')">
-                <h4>🥁 Breakcore Loop</h4>
-                <p id="cost-breakcore">Cost: 500</p>
-            </div>
-
-            <div class="shop-item" onclick="buy('records')">
-                <h4>🏢 Rede Records</h4>
-                <p id="cost-records">Cost: 2500</p>
-            </div>
-
-            <div class="shop-item" onclick="buy('crown')">
-                <h4>👑 King's Crown</h4>
-                <p id="cost-crown">Cost: 10000</p>
-            </div>
-            
-            <div style="text-align:center; font-size:10px; margin-top:10px; color:#aaa;">Scroll for more ⬇️</div>
-        </div>
+        <div class="save-status">Save progress 💾</div>
     </div>
 
     <script>
-        let score = parseFloat(localStorage.getItem('rede_score')) || 0;
-        let power = parseInt(localStorage.getItem('rede_power')) || 1;
-        let auto = parseInt(localStorage.getItem('rede_auto')) || 0;
+        // Core Variables
+        let score = parseFloat(localStorage.getItem('r_score')) || 0;
+        let pwr = parseInt(localStorage.getItem('r_pwr')) || 1;
+        let rps = parseFloat(localStorage.getItem('r_rps')) || 0;
+        let lastSafeScore = score;
 
-        const costs = {
-            click: 15,
-            shorts: 100,
-            breakcore: 500,
-            records: 2500,
-            crown: 10000
-        };
+        // 40 Unique Career Items
+        const names = [
+            "Mouse Click", "Double Tap", "Shorts Bot", "Gumball Clip", "Breakcore Loop", 
+            "PC Upgrade", "Rede Records", "Viral Hook", "King's Crown", "Pro Studio",
+            "Minutes2cool Master", "Zorts Remix", "Outcast Anthem", "Roblox Scripting", "UGC Designer",
+            "GitHub Pages Pro", "Cloudflare Shield", "itsrede.uk Launch", "Sub Milestone", "Retention God",
+            "Analog Horror Clip", "Distortion Pedal", "Amen Break Pack", "Bass Boost", "Synths for Success",
+            "Nitro Type Gold", "Copper Golem Hoodie", "Purple Heart Cape", "Gaming Chair", "Dual Monitors",
+            "Terming Gods X HQ", "Digital Safety Org", "Brand Ambassador", "Merch Drop", "Red Simple T-Shirt",
+            "World Tour", "Stadium Show", "Billboard Hit", "Grammy Winner", "Internet Legend"
+        ];
 
-        const scoreEl = document.getElementById('score');
-        const rpsEl = document.getElementById('rps');
-        const btn = document.getElementById('clicker-btn');
+        const emojis = ["🖱️", "👆", "🎥", "🐱", "🥁", "💻", "🏢", "🪝", "👑", "🎙️", "💿", "🎵", "🎸", "🧱", "🎨", "🌐", "☁️", "🚀", "📈", "🔥", "📺", "📻", "🥁", "🔉", "🎹", "🏁", "🤖", "💜", "💺", "🖥️", "🛡️", "👮", "🤝", "👕", "🔴", "🌍", "🏟️", "📊", "🏆", "🌟"];
 
-        function updateUI() {
-            scoreEl.innerText = Math.floor(score);
-            rpsEl.innerText = `Rede per second: ${auto}`;
-            document.getElementById('cost-click').innerText = `Cost: ${Math.floor(costs.click * Math.pow(1.5, power - 1))}`;
-            document.getElementById('cost-shorts').innerText = `Cost: ${Math.floor(costs.shorts * Math.pow(1.2, auto))}`;
-            // (Repeat logic for other items as needed)
-            
-            localStorage.setItem('rede_score', score);
-            localStorage.setItem('rede_power', power);
-            localStorage.setItem('rede_auto', auto);
+        const items = [];
+        for(let i = 0; i < 40; i++) {
+            items.push({
+                name: names[i],
+                type: i % 3 === 0 ? "click" : "rps",
+                cost: Math.floor(15 * Math.pow(1.5, i)),
+                boost: Math.floor(1 * Math.pow(1.4, i)),
+                emoji: emojis[i]
+            });
         }
 
-        btn.addEventListener('click', (e) => {
-            score += power;
-            btn.classList.remove('spin');
-            void btn.offsetWidth;
-            btn.classList.add('spin');
+        function renderShop() {
+            const container = document.getElementById('shop-container');
+            container.innerHTML = '<h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>';
             
-            const p = document.createElement('div');
-            p.className = 'floating-point';
-            p.innerText = `+${power}`;
-            p.style.left = e.clientX + 'px';
-            p.style.top = e.clientY + 'px';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 800);
-            
-            updateUI();
-        });
+            items.forEach((item, index) => {
+                // Progression Logic: Only show if they have 70% of the cost or it's the start
+                const canSee = score >= (item.cost * 0.7) || index < 3;
+                if (canSee) {
+                    const btn = document.createElement('div');
+                    const affordable = score >= item.cost;
+                    btn.className = `shop-item ${!affordable ? 'locked' : ''}`;
+                    btn.innerHTML = `
+                        <h4>${item.emoji} ${item.name}</h4>
+                        <p>Cost: ${Math.floor(item.cost).toLocaleString()} | +${item.boost} ${item.type.toUpperCase()}</p>
+                    `;
+                    if (affordable) btn.onclick = () => buyItem(index);
+                    container.appendChild(btn);
+                }
+            });
+        }
 
-        function buy(type) {
-            let costKey = type;
-            let currentCost = type === 'click' ? 
-                Math.floor(costs.click * Math.pow(1.5, power - 1)) : 
-                Math.floor(costs[type] * Math.pow(1.2, auto));
-
-            if (score >= currentCost) {
-                score -= currentCost;
-                if (type === 'click') power++;
-                else auto += (type === 'shorts' ? 1 : type === 'breakcore' ? 5 : type === 'records' ? 25 : 100);
-                updateUI();
+        function buyItem(idx) {
+            const item = items[idx];
+            if (score >= item.cost) {
+                score -= item.cost;
+                if (item.type === 'click') pwr += item.boost;
+                else rps += item.boost;
+                item.cost *= 1.3; 
+                save();
             }
         }
 
+        function save() {
+            localStorage.setItem('r_score', score);
+            localStorage.setItem('r_pwr', pwr);
+            localStorage.setItem('r_rps', rps);
+            document.getElementById('score').innerText = Math.floor(score).toLocaleString();
+            document.getElementById('rps').innerText = `REDE PER SECOND: ${rps.toFixed(1)}`;
+            renderShop();
+        }
+
+        // Anti-Cheat Loop
         setInterval(() => {
-            if (auto > 0) {
-                score += (auto / 10);
-                updateUI();
+            // If score jumps more than 2 million in 100ms, it's likely a console cheat
+            if (score > lastSafeScore + 2000000) {
+                score = parseFloat(localStorage.getItem('r_score')) || 0;
+                alert("Anti-Cheat: Resetting to last legitimate save!");
             }
+            score += rps / 10;
+            save();
+            lastSafeScore = score;
         }, 100);
 
-        updateUI();
+        document.getElementById('clicker-btn').onclick = () => {
+            score += pwr;
+            save();
+        };
+
+        // Extra Anti-Cheat: Disable Right Click and F12
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = (e) => { if(e.keyCode == 123) return false; };
+
+        renderShop();
+        save();
     </script>
 </body>
 </html>

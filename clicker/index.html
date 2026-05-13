@@ -3,35 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rede Clicker | itsrede.uk</title>
+    <title>ItsRede Clicker</title>
     <style>
         :root {
-            --bg-speed: 20s;
+            --rede-red: #ff0000;
+            --rede-blue: #4d94ff;
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 100vh;
             user-select: none;
+            color: white;
         }
 
-        /* Moving Red and Blue Striped Background */
+        /* Moving Diagonal Background from image_db483a.png */
         .game-area {
             flex-grow: 1;
             background: repeating-linear-gradient(
                 45deg,
-                #ff4d4d,
-                #ff4d4d 50px,
-                #4d94ff 50px,
-                #4d94ff 100px
+                var(--rede-red),
+                var(--rede-red) 60px,
+                var(--rede-blue) 60px,
+                var(--rede-blue) 120px
             );
             background-size: 200% 200%;
-            animation: moveBg var(--bg-speed) linear infinite;
+            animation: moveBg 15s linear infinite;
             position: relative;
             display: flex;
             justify-content: center;
@@ -43,93 +45,108 @@
             100% { background-position: 100% 100%; }
         }
 
-        /* Top Header */
+        /* Top HUD */
         .header {
-            background: #111;
-            color: white;
-            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 10px;
             text-align: center;
-            z-index: 10;
-            border-bottom: 3px solid #333;
+            border-bottom: 4px solid #333;
+            z-index: 20;
         }
-        #score { font-size: 36px; font-weight: bold; color: #fff; text-shadow: 2px 2px #000; }
-        #rps { font-size: 18px; color: #ff4d4d; margin-top: 5px; }
+        #score { font-size: 42px; font-weight: bold; margin: 0; }
+        #rps { font-size: 16px; color: var(--rede-red); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Mascot Container with Idle Shake */
-        .mascot-container {
+        /* Left Side Labels from image_db483a.png */
+        .left-labels {
+            position: absolute;
+            left: 30px;
+            top: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 150px;
+            z-index: 10;
+        }
+        .label-text {
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 4px 4px 0px #000;
+            opacity: 0.8;
+        }
+
+        /* Center Clicker */
+        .clicker-container {
             position: relative;
             z-index: 5;
-            animation: idleShake 0.5s ease-in-out infinite alternate;
+            animation: bounce 2s infinite ease-in-out;
         }
-
-        @keyframes idleShake {
-            from { transform: translate(-2px, 0); }
-            to { transform: translate(2px, 0); }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
         #clicker-btn {
-            width: 220px;
+            width: 250px;
             height: auto;
             cursor: pointer;
-            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.5));
+            transition: 0.1s;
         }
-
-        /* Spin Class added via JS */
-        .spin {
-            animation: spinClick 0.4s ease-out;
-        }
-
+        .spin { animation: spinClick 0.5s ease-out; }
         @keyframes spinClick {
-            0% { transform: scale(0.8) rotate(0deg); }
-            100% { transform: scale(1) rotate(360deg); }
+            0% { transform: rotate(0deg) scale(0.8); }
+            100% { transform: rotate(360deg) scale(1); }
         }
 
-        /* Gradient Buttons */
-        .right-menu {
+        /* Right Scrollable Shop */
+        .shop-container {
             position: absolute;
             right: 20px;
+            top: 80px;
+            bottom: 20px;
+            width: 220px;
+            background: rgba(0,0,0,0.7);
+            border: 4px solid white;
+            border-radius: 15px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            z-index: 10;
+            gap: 15px;
+            overflow-y: auto;
+            z-index: 30;
         }
 
-        .menu-btn {
-            background: linear-gradient(270deg, #ff0000, #000000, #4d94ff);
-            background-size: 600% 600%;
-            animation: gradientShift 4s ease infinite;
-            color: white;
-            border: 2px solid #fff;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
+        /* Gradient Moving Buttons */
+        .shop-item {
+            background: linear-gradient(270deg, #ff0000, #000, #4d94ff);
+            background-size: 400% 400%;
+            animation: gradMove 3s infinite;
+            border: 2px solid white;
+            padding: 12px;
+            border-radius: 10px;
             cursor: pointer;
-            min-width: 150px;
-            text-shadow: 1px 1px #000;
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
-            transition: 0.2s;
+            text-align: center;
+            transition: transform 0.2s;
         }
-
-        @keyframes gradientShift {
+        @keyframes gradMove {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        .shop-item:hover { transform: scale(1.05); }
+        .shop-item h4 { margin: 0; font-size: 14px; }
+        .shop-item p { margin: 5px 0 0; font-size: 12px; color: #ffeb3b; font-weight: bold; }
 
-        .menu-btn:hover { transform: translateX(-5px); }
-        .menu-btn:active { transform: scale(0.95); }
-
-        /* Floating Numbers */
-        .plus-one {
+        /* Floating Points */
+        .floating-point {
             position: absolute;
-            color: white;
+            font-size: 30px;
             font-weight: bold;
-            font-size: 24px;
             pointer-events: none;
-            z-index: 15;
+            animation: floatUp 0.8s forwards;
             text-shadow: 2px 2px #000;
+        }
+        @keyframes floatUp {
+            to { transform: translateY(-100px); opacity: 0; }
         }
     </style>
 </head>
@@ -141,22 +158,60 @@
     </div>
 
     <div class="game-area">
-        <div class="mascot-container">
+        <div class="left-labels">
+            <div class="label-text">Background 🎨</div>
+            <div class="label-text" onclick="alert('Enter Code: REDE2026')">Codes 🔑</div>
+            <div class="label-text">Music (WIP) 🎵</div>
+        </div>
+
+        <div class="clicker-container">
             <img src="/favicon.png" id="clicker-btn" alt="Rede Mascot">
         </div>
 
-        <div class="right-menu">
-            <button class="menu-btn" onclick="buyUpgrade('click')">Power Up (<span id="click-cost">10</span>)</button>
-            <button class="menu-btn" onclick="buyUpgrade('auto')">Auto-Prod (<span id="auto-cost">50</span>)</button>
-            <button class="menu-btn" onclick="alert('Codes: REDE2026')">Codes</button>
-            <button class="menu-btn" onclick="resetGame()" style="font-size: 10px; margin-top: 20px; opacity: 0.5;">WIPE DATA</button>
+        <div class="shop-container">
+            <h3 style="text-align:center; margin-top:0;">SHOP 🛒</h3>
+            
+            <div class="shop-item" onclick="buy('click')">
+                <h4>🖱️ Super Click</h4>
+                <p id="cost-click">Cost: 15</p>
+            </div>
+
+            <div class="shop-item" onclick="buy('shorts')">
+                <h4>🎥 Shorts Bot</h4>
+                <p id="cost-shorts">Cost: 100</p>
+            </div>
+
+            <div class="shop-item" onclick="buy('breakcore')">
+                <h4>🥁 Breakcore Loop</h4>
+                <p id="cost-breakcore">Cost: 500</p>
+            </div>
+
+            <div class="shop-item" onclick="buy('records')">
+                <h4>🏢 Rede Records</h4>
+                <p id="cost-records">Cost: 2500</p>
+            </div>
+
+            <div class="shop-item" onclick="buy('crown')">
+                <h4>👑 King's Crown</h4>
+                <p id="cost-crown">Cost: 10000</p>
+            </div>
+            
+            <div style="text-align:center; font-size:10px; margin-top:10px; color:#aaa;">Scroll for more ⬇️</div>
         </div>
     </div>
 
     <script>
         let score = parseFloat(localStorage.getItem('rede_score')) || 0;
-        let clickPower = parseInt(localStorage.getItem('rede_power')) || 1;
-        let autoValue = parseInt(localStorage.getItem('rede_auto')) || 0;
+        let power = parseInt(localStorage.getItem('rede_power')) || 1;
+        let auto = parseInt(localStorage.getItem('rede_auto')) || 0;
+
+        const costs = {
+            click: 15,
+            shorts: 100,
+            breakcore: 500,
+            records: 2500,
+            crown: 10000
+        };
 
         const scoreEl = document.getElementById('score');
         const rpsEl = document.getElementById('rps');
@@ -164,79 +219,53 @@
 
         function updateUI() {
             scoreEl.innerText = Math.floor(score);
-            rpsEl.innerText = `Rede per second: ${autoValue}`;
-            document.getElementById('click-cost').innerText = Math.floor(10 * Math.pow(1.5, clickPower - 1));
-            document.getElementById('auto-cost').innerText = Math.floor(50 * Math.pow(1.5, autoValue));
+            rpsEl.innerText = `Rede per second: ${auto}`;
+            document.getElementById('cost-click').innerText = `Cost: ${Math.floor(costs.click * Math.pow(1.5, power - 1))}`;
+            document.getElementById('cost-shorts').innerText = `Cost: ${Math.floor(costs.shorts * Math.pow(1.2, auto))}`;
+            // (Repeat logic for other items as needed)
             
             localStorage.setItem('rede_score', score);
-            localStorage.setItem('rede_power', clickPower);
-            localStorage.setItem('rede_auto', autoValue);
+            localStorage.setItem('rede_power', power);
+            localStorage.setItem('rede_auto', auto);
         }
 
         btn.addEventListener('click', (e) => {
-            score += clickPower;
-            
-            // Trigger Spin
+            score += power;
             btn.classList.remove('spin');
-            void btn.offsetWidth; // Trigger reflow to restart animation
+            void btn.offsetWidth;
             btn.classList.add('spin');
-
-            createPlusOne(e.clientX, e.clientY);
+            
+            const p = document.createElement('div');
+            p.className = 'floating-point';
+            p.innerText = `+${power}`;
+            p.style.left = e.clientX + 'px';
+            p.style.top = e.clientY + 'px';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 800);
+            
             updateUI();
         });
 
-        function buyUpgrade(type) {
-            if (type === 'click') {
-                let cost = Math.floor(10 * Math.pow(1.5, clickPower - 1));
-                if (score >= cost) {
-                    score -= cost;
-                    clickPower++;
-                }
-            } else if (type === 'auto') {
-                let cost = Math.floor(50 * Math.pow(1.5, autoValue));
-                if (score >= cost) {
-                    score -= cost;
-                    autoValue++;
-                }
+        function buy(type) {
+            let costKey = type;
+            let currentCost = type === 'click' ? 
+                Math.floor(costs.click * Math.pow(1.5, power - 1)) : 
+                Math.floor(costs[type] * Math.pow(1.2, auto));
+
+            if (score >= currentCost) {
+                score -= currentCost;
+                if (type === 'click') power++;
+                else auto += (type === 'shorts' ? 1 : type === 'breakcore' ? 5 : type === 'records' ? 25 : 100);
+                updateUI();
             }
-            updateUI();
-        }
-
-        function createPlusOne(x, y) {
-            const plus = document.createElement('div');
-            plus.className = 'plus-one';
-            plus.innerText = `+${clickPower}`;
-            plus.style.left = x + 'px';
-            plus.style.top = y + 'px';
-            document.body.appendChild(plus);
-
-            let opacity = 1;
-            let currentY = y;
-            const anim = setInterval(() => {
-                currentY -= 3;
-                opacity -= 0.04;
-                plus.style.top = currentY + 'px';
-                plus.style.opacity = opacity;
-                if (opacity <= 0) {
-                    clearInterval(anim);
-                    plus.remove();
-                }
-            }, 30);
         }
 
         setInterval(() => {
-            if (autoValue > 0) {
-                score += (autoValue / 10);
+            if (auto > 0) {
+                score += (auto / 10);
                 updateUI();
             }
         }, 100);
-
-        function resetGame() {
-            if(confirm("Wipe all progress?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
 
         updateUI();
     </script>

@@ -22,7 +22,7 @@
         #score { font-size: 56px; margin: 0; font-weight: bold; text-shadow: 3px 3px #000; }
         #rps { color: var(--rede-red); font-size: 16px; font-weight: bold; }
 
-        /* Progress Note & Checkmark (as seen in image_d9ef79.png) */
+        /* Progress Note & Checkmark */
         .progression-note {
             position: absolute; top: 15px; left: 150px; display: flex; align-items: center; gap: 10px; z-index: 101;
         }
@@ -53,14 +53,22 @@
         .shop-item h4 { margin: 0; font-size: 16px; color: var(--rede-blue); text-transform: uppercase; pointer-events: none; }
         .shop-item p { margin: 5px 0 0; font-size: 13px; color: #ffeb3b; font-weight: bold; pointer-events: none; }
 
-        /* Mascot Icon Fix */
+        /* Mascot Icon with Spin Effect */
         #clicker-btn { 
             width: 260px; height: 260px; cursor: pointer; z-index: 10; 
-            transition: transform 0.05s;
+            transition: transform 0.1s;
             filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
             object-fit: contain;
         }
         #clicker-btn:active { transform: scale(0.92); }
+
+        /* Spin animation class */
+        .spinning { animation: spinMascot 0.4s ease-out; }
+        @keyframes spinMascot {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.15) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
 
         /* Save Status */
         .save-status { position: absolute; bottom: 20px; left: 20px; font-size: 24px; font-weight: bold; text-shadow: 2px 2px #000; }
@@ -84,8 +92,11 @@
             <div class="menu-btn">Music (WIP) 🎵</div>
         </div>
 
-        <!-- Reference to the mascot stickman with red hat -->
-        <img src="favicon.png" id="clicker-btn" alt="Rede Mascot">
+        <!-- Mascot stickman with backup source -->
+        <img src="favicon.png" 
+             id="clicker-btn" 
+             alt="Rede Mascot" 
+             onerror="this.src='https://itsrede.uk/favicon.png'">
 
         <div class="shop" id="shop-container">
             <h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>
@@ -138,7 +149,6 @@
                         <h4>${item.emoji} ${item.name}</h4>
                         <p>Cost: ${Math.floor(item.cost).toLocaleString()} | +${item.boost} ${item.type.toUpperCase()}</p>
                     `;
-                    // Fixed the click handler to ensure buying works properly
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         buyItem(index);
@@ -156,7 +166,7 @@
                 else rps += item.boost;
                 item.cost *= 1.35; 
                 save();
-                renderShop(); // Instant refresh after purchase
+                renderShop();
             }
         }
 
@@ -170,7 +180,6 @@
 
         // Main Loop
         setInterval(() => {
-            // Anti-Cheat Check
             if (score > lastSafeScore + 3000000) {
                 score = parseFloat(localStorage.getItem('r_score')) || 0;
                 alert("Anti-Cheat: Integrity failure. Resetting!");
@@ -180,12 +189,17 @@
             lastSafeScore = score;
         }, 100);
 
-        // Separate Shop Refresh to prevent click interference
-        setInterval(renderShop, 1000);
+        setInterval(renderShop, 1500);
 
-        document.getElementById('clicker-btn').onclick = () => {
+        const mascot = document.getElementById('clicker-btn');
+        mascot.onclick = () => {
             score += pwr;
             save();
+            
+            // Spin Animation Logic
+            mascot.classList.remove('spinning');
+            void mascot.offsetWidth; // Trigger reflow to restart animation
+            mascot.classList.add('spinning');
         };
 
         document.addEventListener('contextmenu', e => e.preventDefault());

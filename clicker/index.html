@@ -8,14 +8,17 @@
     <link rel="icon" type="image/jpeg" href="RedeClickerFavion.jpg">
     
     <meta property="og:title" content="ItsRede Clicker">
-    <meta property="og:description" content="Official Clicker Game By ItsRede.">
+    <meta property="og:description" content="Official Clicker Game By ItsRede. Can you reach the Absolute Insanity Rank?">
     <meta property="og:image" content="https://itsrede.uk/ItsRedeEmbedClicker.jpg">
+    <meta property="og:url" content="https://itsrede.uk/clicker">
     <meta name="theme-color" content="#ff0000">
+    <meta name="twitter:card" content="summary_large_image">
 
     <style>
         :root { --rede-red: #ff0000; --rede-blue: #4d94ff; --rede-gold: #ffd700; }
         body { margin: 0; font-family: 'Comic Sans MS', cursive; overflow: hidden; height: 100vh; background: #000; color: white; user-select: none; }
 
+        /* Moving Background */
         .game-area {
             flex-grow: 1; height: 100vh;
             background: repeating-linear-gradient(45deg, var(--rede-red), var(--rede-red) 60px, var(--rede-blue) 60px, var(--rede-blue) 120px);
@@ -24,27 +27,78 @@
         }
         @keyframes moveBg { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
 
+        /* HUD & Top Bar - UPDATED: Slimmer Look */
         .header { 
-            position: absolute; top: 0; width: 100%; background: rgba(15, 15, 15, 0.95); 
-            padding: 2px 0; text-align: center; border-bottom: 2px solid var(--rede-gold); z-index: 100; 
+            position: absolute; 
+            top: 0; 
+            width: 100%; 
+            background: rgba(15, 15, 15, 0.95); 
+            padding: 2px 0; /* Reduced padding */
+            text-align: center; 
+            border-bottom: 2px solid var(--rede-gold); 
+            z-index: 100; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
-        #score { font-size: 36px; margin: 0; font-weight: bold; text-shadow: 2px 2px #000; line-height: 1; }
+        #score { font-size: 36px; margin: 0; font-weight: bold; text-shadow: 2px 2px #000; line-height: 1; } /* Smaller score */
+        #title-flex { font-size: 14px; color: var(--rede-gold); font-weight: bold; text-transform: uppercase; margin-bottom: 0; }
         .stats-row { display: flex; justify-content: center; gap: 15px; margin-top: 0; }
+        #rps { color: var(--rede-red); font-size: 12px; font-weight: bold; }
+        #click-strength { color: #00ff00; font-size: 12px; font-weight: bold; }
 
+        /* Left Side Menu */
         .left-menu { position: absolute; left: 20px; top: 80px; display: flex; flex-direction: column; gap: 10px; z-index: 50; }
         .menu-btn { 
             background: white; color: black; border: 3px solid black; padding: 8px 15px; 
             border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; 
-            box-shadow: 3px 3px 0px #000;
+            display: flex; align-items: center; gap: 8px; font-size: 14px; box-shadow: 3px 3px 0px #000;
+        }
+        .menu-btn:hover { transform: scale(1.05); background: var(--rede-red); color: white; }
+
+        /* Popups / Overlays */
+        .overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; 
+            align-items: center; z-index: 1000; 
+        }
+        .popup { 
+            background: white; color: black; border: 6px solid black; padding: 25px; 
+            border-radius: 20px; width: 350px; text-align: center; position: relative; 
+            box-shadow: 10px 10px 0px var(--rede-red);
+        }
+        .close-btn { position: absolute; top: 5px; right: 12px; font-size: 25px; cursor: pointer; font-weight: bold; }
+        .code-input { width: 80%; padding: 10px; margin: 15px 0; border: 3px solid black; border-radius: 8px; font-family: inherit; font-size: 18px; text-align: center; }
+
+        /* Rebirth Button */
+        .rebirth-container { position: absolute; bottom: 60px; left: 20px; z-index: 60; display: flex; flex-direction: column; gap: 5px; }
+        #rebirth-btn {
+            background: #000; color: var(--rede-gold); border: 3px solid var(--rede-gold);
+            padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer;
+            transition: 0.2s; font-size: 16px; text-transform: uppercase;
+        }
+        #rebirth-btn:hover { background: var(--rede-gold); color: #000; transform: translateY(-3px); }
+        #rebirth-btn.ready { animation: pulseGold 1.5s infinite; }
+        @keyframes pulseGold {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
         }
 
+        /* Shop System */
         .shop {
             position: absolute; right: 20px; top: 80px; bottom: 30px; width: 280px;
             background: rgba(0,0,0,0.9); border: 3px solid white; border-radius: 15px;
             padding: 15px; overflow-y: auto; z-index: 50;
         }
+        .shop-item {
+            background: #111; border: 2px solid #444; border-radius: 8px;
+            padding: 10px; margin-bottom: 8px; cursor: pointer; transition: 0.1s;
+        }
+        .shop-item:hover:not(.locked) { background: #222; border-color: white; transform: translateX(-5px); }
+        .shop-item.locked { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
+        .shop-item h4 { margin: 0; font-size: 14px; color: var(--rede-blue); text-transform: uppercase; pointer-events: none; }
+        .shop-item p { margin: 5px 0 0; font-size: 12px; color: #ffeb3b; font-weight: bold; pointer-events: none; }
 
-        /* Mascot Icon: Reverted to Default */
+        /* Mascot Icon */
         #clicker-btn { 
             width: 260px; height: 260px; cursor: pointer; z-index: 10; 
             transition: transform 0.1s; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
@@ -58,6 +112,9 @@
             50% { transform: scale(1.15) rotate(180deg); }
             100% { transform: scale(1) rotate(360deg); }
         }
+
+        /* Save Status */
+        .save-status { position: absolute; bottom: 20px; left: 20px; font-size: 14px; font-weight: bold; text-shadow: 2px 2px #000; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -66,21 +123,49 @@
         <div id="title-flex">NEWGEN</div>
         <div id="score">0</div>
         <div class="stats-row">
-            <div id="click-strength" style="color:#00ff00; font-size:12px;">CLICK: 1</div>
-            <div id="rps" style="color:var(--rede-red); font-size:12px;">RPS: 0.0</div>
+            <div id="click-strength">CLICK STRENGTH: 1</div>
+            <div id="rps">REDE PER SECOND: 0.0</div>
+        </div>
+    </div>
+
+    <div id="info-gui" class="overlay">
+        <div class="popup">
+            <span class="close-btn" onclick="togglePopup('info-gui')">×</span>
+            <h2 style="margin-top:0;">GAME INFO ℹ️</h2>
+            <p>Click the mascot to earn Rede Points! Use Rede to buy upgrades and increase your production.</p>
+            <p><b>Rebirth:</b> Resets your score but gives a <b>2x Multiplier</b> every time!</p>
+        </div>
+    </div>
+
+    <div id="codes-gui" class="overlay">
+        <div class="popup">
+            <span class="close-btn" onclick="togglePopup('codes-gui')">×</span>
+            <h2 style="margin-top:0;">REDEEM CODES 🔑</h2>
+            <p style="font-size: 14px; color: var(--rede-blue);">Follow @itsredeyt on Twitter for more codes!</p>
+            <input type="text" id="code-input" class="code-input" placeholder="Enter Code...">
+            <button class="menu-btn" style="margin: 0 auto; box-shadow: 2px 2px 0 #000;" onclick="redeemCode()">REDEEM</button>
         </div>
     </div>
 
     <div class="game-area">
         <div class="left-menu">
-            <div class="menu-btn">Game Info ℹ️</div>
+            <div class="menu-btn" onclick="togglePopup('info-gui')">Game Info ℹ️</div>
+            <div class="menu-btn" onclick="togglePopup('codes-gui')">Codes 🔑</div>
+            <div class="menu-btn" onclick="alert('Music coming soon! 🎵')">Music 🎵</div>
         </div>
 
         <img src="https://itsrede.uk/favicon.png" id="clicker-btn" alt="Rede Mascot">
 
+        <div class="rebirth-container">
+            <button id="rebirth-btn" onclick="attemptRebirth()">Rebirth</button>
+            <div id="rebirth-cost" style="font-size: 12px; color: var(--rede-gold); text-align: center;">Cost: 1M</div>
+        </div>
+
         <div class="shop" id="shop-container">
             <h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>
         </div>
+
+        <div class="save-status">Progress Saved! 💾</div>
     </div>
 
     <script>
@@ -88,27 +173,123 @@
         let pwr = parseInt(localStorage.getItem('r_pwr')) || 1;
         let rps = parseFloat(localStorage.getItem('r_rps')) || 0;
         let rebirths = parseInt(localStorage.getItem('r_rebirths')) || 0;
+        let usedCodes = JSON.parse(localStorage.getItem('r_used_codes')) || [];
+
+        const titleRanks = ["Newgen", "Veteran", "Producer", "OPSEC Demon", "Larp", "Founder", "Legend", "Untouchable", "Ascended", "Absolute Insanity"];
+        const activeCodes = { "REDE2026": 50000, "50MILLION": 1000000 };
+
+        const names = ["Mouse Click", "Double Tap", "Shorts Bot", "Gumball Clip", "Breakcore Loop", "PC Upgrade", "Rede Records", "Viral Hook", "King's Crown", "Pro Studio", "Minutes2cool Master", "Zorts Remix", "Outcast Anthem", "Roblox Scripting", "UGC Designer", "GitHub Pages Pro", "Cloudflare Shield", "itsrede.uk Launch", "Sub Milestone", "Retention God", "Analog Horror Clip", "Distortion Pedal", "Amen Break Pack", "Bass Boost", "Synths for Success", "Nitro Type Gold", "Copper Golem Hoodie", "Purple Heart Cape", "Gaming Chair", "Dual Monitors", "Terming Gods X HQ", "Digital Safety Org", "Brand Ambassador", "Merch Drop", "Red Simple T-Shirt", "World Tour", "Stadium Show", "Billboard Hit", "Grammy Winner", "Internet Legend", "Cyber Space", "Neural Link", "Satellite Node", "Quantum Clicker", "AI Ghostwriter", "Void Bass", "Glitched Reality", "Infinity Loop"];
+        const emojis = ["🖱️", "👆", "🎥", "🐱", "🥁", "💻", "🏢", "🪝", "👑", "🎙️", "💿", "🎵", "🎸", "🧱", "🎨", "🌐", "☁️", "🚀", "📈", "🔥", "📺", "📻", "🥁", "🔉", "🎹", "🏁", "🤖", "💜", "💺", "🖥️", "🛡️", "👮", "🤝", "👕", "🔴", "🌍", "🏟️", "📊", "🏆", "🌟", "🌌", "🧠", "📡", "⚛️", "🤖", "🔈", "👾", "🌀"];
+
+        const items = [];
+        for(let i = 0; i < 65; i++) {
+            let n = names[i] || `Advanced Upgrade ${i}`;
+            let e = emojis[i] || "💎";
+            items.push({ 
+                name: n, 
+                type: i % 3 === 0 ? "click" : "rps", 
+                cost: Math.floor(15 * Math.pow(1.6, i)), 
+                boost: Math.floor(1 * Math.pow(1.5, i)), 
+                emoji: e 
+            });
+        }
+
+        function togglePopup(id) {
+            const gui = document.getElementById(id);
+            gui.style.display = (gui.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function redeemCode() {
+            const input = document.getElementById('code-input').value.toUpperCase();
+            if (usedCodes.includes(input)) { alert("You've already used this code!"); return; }
+            if (activeCodes[input]) {
+                score += activeCodes[input];
+                usedCodes.push(input);
+                localStorage.setItem('r_used_codes', JSON.stringify(usedCodes));
+                alert(`Success! You got ${activeCodes[input].toLocaleString()} Rede!`);
+                document.getElementById('code-input').value = "";
+                togglePopup('codes-gui');
+                save();
+            } else { alert("Invalid code!"); }
+        }
+
+        function getMultiplier() { return Math.pow(2, rebirths); }
+        function getRebirthCost() { return 1000000 * Math.pow(10, rebirths); }
+
+        function renderShop() {
+            const container = document.getElementById('shop-container');
+            container.innerHTML = '<h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>';
+            items.forEach((item, index) => {
+                const canSee = score >= (item.cost * 0.60) || index < 3;
+                if (canSee) {
+                    const btn = document.createElement('div');
+                    const affordable = score >= item.cost;
+                    btn.className = `shop-item ${!affordable ? 'locked' : ''}`;
+                    btn.innerHTML = `<h4>${item.emoji} ${item.name}</h4><p>Cost: ${Math.floor(item.cost).toLocaleString()} | +${item.boost} ${item.type.toUpperCase()}</p>`;
+                    btn.onclick = (e) => { e.stopPropagation(); buyItem(index); };
+                    container.appendChild(btn);
+                }
+            });
+        }
+
+        function buyItem(idx) {
+            const item = items[idx];
+            if (score >= item.cost) {
+                score -= item.cost;
+                if (item.type === 'click') pwr += item.boost;
+                else rps += item.boost;
+                item.cost *= 1.35; 
+                save();
+                renderShop();
+            }
+        }
+
+        function attemptRebirth() {
+            const cost = getRebirthCost();
+            if (score >= cost) {
+                if (confirm(`Rebirth for ${Math.pow(2, rebirths + 1)}x Multiplier?`)) {
+                    rebirths++;
+                    score = 0; pwr = 1; rps = 0;
+                    items.forEach((item, i) => item.cost = Math.floor(15 * Math.pow(1.6, i)));
+                    localStorage.setItem('r_rebirths', rebirths);
+                    save(); renderShop();
+                }
+            } else { alert(`You need ${cost.toLocaleString()} Rede!`); }
+        }
 
         function save() {
-            const mult = Math.pow(2, rebirths);
+            const mult = getMultiplier();
             localStorage.setItem('r_score', score);
+            localStorage.setItem('r_pwr', pwr);
+            localStorage.setItem('r_rps', rps);
             document.getElementById('score').innerText = Math.floor(score).toLocaleString();
             document.getElementById('rps').innerText = `RPS: ${(rps * mult).toFixed(1)}`;
             document.getElementById('click-strength').innerText = `CLICK: ${Math.floor(pwr * mult).toLocaleString()}`;
+            document.getElementById('title-flex').innerText = titleRanks[Math.min(rebirths, titleRanks.length - 1)];
+            const rBtn = document.getElementById('rebirth-btn');
+            rBtn.innerText = `Rebirth (${rebirths})`;
+            document.getElementById('rebirth-cost').innerText = `Cost: ${getRebirthCost().toLocaleString()}`;
+            if (score >= getRebirthCost()) rBtn.classList.add('ready');
+            else rBtn.classList.remove('ready');
         }
 
-        setInterval(() => { score += (rps * Math.pow(2, rebirths)) / 10; save(); }, 100);
-        
+        setInterval(() => {
+            score += (rps * getMultiplier()) / 10;
+            save();
+        }, 100);
+
+        setInterval(renderShop, 3000);
         const mascot = document.getElementById('clicker-btn');
         mascot.onclick = () => {
-            score += (pwr * Math.pow(2, rebirths));
+            score += (pwr * getMultiplier());
             save();
             mascot.classList.remove('spinning');
             void mascot.offsetWidth;
             mascot.classList.add('spinning');
         };
 
-        save();
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        renderShop(); save();
     </script>
 </body>
 </html>

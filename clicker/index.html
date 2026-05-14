@@ -16,15 +16,19 @@
             position: relative; display: flex; justify-content: center; align-items: center;
         }
         @keyframes moveBg { 0% { background-position: 0 0; } 100% { background-position: 100% 100%; } }
+        
+        .rebirth-glitch { animation: glitch 0.3s cubic-bezier(.25,.46,.45,.94) both infinite; }
+        @keyframes glitch { 0% { filter: hue-rotate(0deg); } 50% { filter: hue-rotate(90deg) invert(1); } 100% { filter: hue-rotate(360deg); } }
 
         /* HUD & Top Bar */
         .header { position: absolute; top: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 10px; text-align: center; border-bottom: 4px solid #000; z-index: 100; }
         #score { font-size: 56px; margin: 0; font-weight: bold; text-shadow: 3px 3px #000; }
+        #title-flex { font-size: 22px; color: var(--rede-gold); font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
         .stats-row { display: flex; justify-content: center; gap: 20px; margin-top: 5px; }
         #rps { color: var(--rede-red); font-size: 16px; font-weight: bold; }
         #click-strength { color: #00ff00; font-size: 16px; font-weight: bold; }
 
-        /* Left Side Menu */
+        /* Menus */
         .left-menu { position: absolute; left: 20px; top: 120px; display: flex; flex-direction: column; gap: 15px; z-index: 50; }
         .menu-btn { 
             background: white; color: black; border: 4px solid black; padding: 12px 20px; 
@@ -33,20 +37,18 @@
         }
         .menu-btn:hover { transform: scale(1.05); background: var(--rede-red); color: white; }
 
-        /* Rebirth Button (Bottom Left) */
-        .rebirth-container { position: absolute; bottom: 60px; left: 20px; z-index: 60; display: flex; flex-direction: column; gap: 5px; }
-        #rebirth-btn {
-            background: #000; color: var(--rede-gold); border: 3px solid var(--rede-gold);
-            padding: 15px 25px; border-radius: 10px; font-weight: bold; cursor: pointer;
-            transition: 0.2s; font-size: 20px; text-transform: uppercase;
+        /* Overlays (Popups) */
+        .overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); display: none; justify-content: center; 
+            align-items: center; z-index: 1000; backdrop-filter: blur(5px);
         }
-        #rebirth-btn:hover { background: var(--rede-gold); color: #000; transform: translateY(-3px); }
-        #rebirth-btn.ready { animation: pulseGold 1.5s infinite; }
-        @keyframes pulseGold {
-            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        .popup { 
+            background: #111; border: 5px solid white; padding: 30px; border-radius: 20px; 
+            width: 400px; text-align: center; position: relative;
         }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: var(--rede-red); }
+        input { width: 80%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; font-family: inherit; font-size: 18px; }
 
         /* Shop System */
         .shop {
@@ -54,37 +56,28 @@
             background: rgba(0,0,0,0.9); border: 3px solid white; border-radius: 15px;
             padding: 15px; overflow-y: auto; z-index: 50;
         }
-        .shop-item {
-            background: #111; border: 2px solid #444; border-radius: 8px;
-            padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.1s;
-        }
-        .shop-item:hover:not(.locked) { background: #222; border-color: white; transform: translateX(-5px); }
+        .shop-item { background: #111; border: 2px solid #444; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.1s; }
+        .shop-item:hover:not(.locked) { border-color: white; transform: translateX(-5px); }
         .shop-item.locked { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
-        .shop-item h4 { margin: 0; font-size: 16px; color: var(--rede-blue); text-transform: uppercase; pointer-events: none; }
-        .shop-item p { margin: 5px 0 0; font-size: 13px; color: #ffeb3b; font-weight: bold; pointer-events: none; }
 
-        /* Mascot Icon with Spin Effect */
-        #clicker-btn { 
-            width: 260px; height: 260px; cursor: pointer; z-index: 10; 
-            transition: transform 0.1s; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-            object-fit: contain;
+        /* Rebirth */
+        .rebirth-container { position: absolute; bottom: 60px; left: 20px; z-index: 60; text-align: center; }
+        #rebirth-btn {
+            background: #000; color: var(--rede-gold); border: 3px solid var(--rede-gold);
+            padding: 15px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 20px;
         }
-        #clicker-btn:active { transform: scale(0.92); }
+        #rebirth-btn.ready { animation: pulseGold 1.5s infinite; }
+        @keyframes pulseGold { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
 
-        .spinning { animation: spinMascot 0.4s ease-out; }
-        @keyframes spinMascot {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.15) rotate(180deg); }
-            100% { transform: scale(1) rotate(360deg); }
-        }
-
-        /* Save Status */
-        .save-status { position: absolute; bottom: 20px; left: 20px; font-size: 18px; font-weight: bold; text-shadow: 2px 2px #000; opacity: 0.8; }
+        #clicker-btn { width: 260px; height: 260px; cursor: pointer; z-index: 10; transition: transform 0.1s; object-fit: contain; }
+        #clicker-btn:active { transform: scale(0.9); }
+        .save-status { position: absolute; bottom: 20px; left: 20px; font-size: 18px; font-weight: bold; opacity: 0.8; }
     </style>
 </head>
 <body>
 
     <div class="header">
+        <div id="title-flex">NEWCOMER</div>
         <div id="score">0</div>
         <div class="stats-row">
             <div id="click-strength">CLICK STRENGTH: 1</div>
@@ -92,18 +85,39 @@
         </div>
     </div>
 
-    <div class="game-area">
+    <div id="info-overlay" class="overlay">
+        <div class="popup">
+            <span class="close-btn" onclick="toggleUI('info-overlay')">×</span>
+            <h2>HOW TO PLAY 🎮</h2>
+            <p>1. Click the Mascot to earn Rede.<br>
+            2. Buy Upgrades to automate earnings.<br>
+            3. <b>Rebirth</b> to reset but get a permanent 2x Multiplier per level!<br>
+            4. Unlock rare titles as you climb the ranks.</p>
+        </div>
+    </div>
+
+    <div id="code-overlay" class="overlay">
+        <div class="popup">
+            <span class="close-btn" onclick="toggleUI('code-overlay')">×</span>
+            <h2>REDEEM CODE 🔑</h2>
+            <p style="font-size: 12px; color: #4d94ff;">follow @itsredeyt on twitter for more codes!</p>
+            <input type="text" id="code-input" placeholder="Enter code here...">
+            <button class="menu-btn" style="margin: 10px auto; width: 100px;" onclick="redeemCode()">SUBMIT</button>
+        </div>
+    </div>
+
+    <div id="game-bg" class="game-area">
         <div class="left-menu">
-            <div class="menu-btn">Background 🎨</div>
-            <div class="menu-btn" onclick="alert('CODE: REDE2026')">Codes 🔑</div>
-            <div class="menu-btn">Music (WIP) 🎵</div>
+            <div class="menu-btn" onclick="toggleUI('info-overlay')">How to Play ℹ️</div>
+            <div class="menu-btn" onclick="toggleUI('code-overlay')">Codes 🔑</div>
+            <div class="menu-btn" onclick="alert('Music coming soon in next update!')">Music 🎵</div>
         </div>
 
         <img src="favicon.png" id="clicker-btn" alt="Rede Mascot" onerror="this.src='https://itsrede.uk/favicon.png'">
 
         <div class="rebirth-container">
-            <button id="rebirth-btn" onclick="attemptRebirth()">Rebirth</button>
-            <div id="rebirth-cost" style="font-size: 12px; color: var(--rede-gold); text-align: center;">Cost: 1M</div>
+            <button id="rebirth-btn" onclick="attemptRebirth()">Rebirth (0)</button>
+            <div id="rebirth-cost" style="font-size: 12px; color: var(--rede-gold); margin-top:5px;">Cost: 1M</div>
         </div>
 
         <div class="shop" id="shop-container">
@@ -118,91 +132,61 @@
         let pwr = parseInt(localStorage.getItem('r_pwr')) || 1;
         let rps = parseFloat(localStorage.getItem('r_rps')) || 0;
         let rebirths = parseInt(localStorage.getItem('r_rebirths')) || 0;
-        let lastSafeScore = score;
 
-        const names = [
-            "Mouse Click", "Double Tap", "Shorts Bot", "Gumball Clip", "Breakcore Loop", 
-            "PC Upgrade", "Rede Records", "Viral Hook", "King's Crown", "Pro Studio",
-            "Minutes2cool Master", "Zorts Remix", "Outcast Anthem", "Roblox Scripting", "UGC Designer",
-            "GitHub Pages Pro", "Cloudflare Shield", "itsrede.uk Launch", "Sub Milestone", "Retention God",
-            "Analog Horror Clip", "Distortion Pedal", "Amen Break Pack", "Bass Boost", "Synths for Success",
-            "Nitro Type Gold", "Copper Golem Hoodie", "Purple Heart Cape", "Gaming Chair", "Dual Monitors",
-            "Terming Gods X HQ", "Digital Safety Org", "Brand Ambassador", "Merch Drop", "Red Simple T-Shirt",
-            "World Tour", "Stadium Show", "Billboard Hit", "Grammy Winner", "Internet Legend"
-        ];
-
-        const emojis = ["🖱️", "👆", "🎥", "🐱", "🥁", "💻", "🏢", "🪝", "👑", "🎙️", "💿", "🎵", "🎸", "🧱", "🎨", "🌐", "☁️", "🚀", "📈", "🔥", "📺", "📻", "🥁", "🔉", "🎹", "🏁", "🤖", "💜", "💺", "🖥️", "🛡️", "👮", "🤝", "👕", "🔴", "🌍", "🏟️", "📊", "🏆", "🌟"];
+        const titles = ["Newcomer", "Active Member", "Viral Producer", "Retention God", "Published Author", "Digital Founder", "Internet Legend", "Transcended"];
+        const codes = { "REDE2026": 50000, "50MILLION": 500000, "BRKCORE": 10000 };
 
         const items = [];
         for(let i = 0; i < 40; i++) {
-            items.push({
-                name: names[i],
-                type: i % 3 === 0 ? "click" : "rps",
-                cost: Math.floor(15 * Math.pow(1.55, i)),
-                boost: Math.floor(1 * Math.pow(1.45, i)),
-                emoji: emojis[i]
-            });
+            items.push({ name: `Upgrade ${i+1}`, type: i % 3 === 0 ? "click" : "rps", cost: Math.floor(15 * Math.pow(1.55, i)), boost: Math.floor(1 * Math.pow(1.45, i)) });
         }
 
-        function getMultiplier() {
-            return Math.pow(2, rebirths);
+        function toggleUI(id) {
+            const el = document.getElementById(id);
+            el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        function getRebirthCost() {
-            return 1000000 * Math.pow(10, rebirths);
+        function redeemCode() {
+            const input = document.getElementById('code-input').value.toUpperCase();
+            if(codes[input]) {
+                score += codes[input];
+                alert(`Code Accepted! Received ${codes[input].toLocaleString()} Rede.`);
+                document.getElementById('code-input').value = "";
+                toggleUI('code-overlay');
+                save();
+            } else { alert("Invalid or Expired Code!"); }
         }
+
+        function getMultiplier() { return Math.pow(2, rebirths); }
+        function getRebirthCost() { return 1000000 * Math.pow(10, rebirths); }
 
         function renderShop() {
             const container = document.getElementById('shop-container');
             container.innerHTML = '<h3 style="text-align:center; margin-top:0;">REDE SHOP 🛒</h3>';
-            
-            items.forEach((item, index) => {
-                const canSee = score >= (item.cost * 0.70) || index < 3;
-                if (canSee) {
+            items.forEach((item, idx) => {
+                if (score >= item.cost * 0.7 || idx < 3) {
                     const btn = document.createElement('div');
-                    const affordable = score >= item.cost;
-                    btn.className = `shop-item ${!affordable ? 'locked' : ''}`;
-                    btn.innerHTML = `
-                        <h4>${item.emoji} ${item.name}</h4>
-                        <p>Cost: ${Math.floor(item.cost).toLocaleString()} | +${item.boost} ${item.type.toUpperCase()}</p>
-                    `;
-                    btn.onclick = (e) => { e.stopPropagation(); buyItem(index); };
+                    btn.className = `shop-item ${score < item.cost ? 'locked' : ''}`;
+                    btn.innerHTML = `<h4>${item.name}</h4><p>Cost: ${Math.floor(item.cost).toLocaleString()} | +${item.boost} ${item.type.toUpperCase()}</p>`;
+                    btn.onclick = () => { if(score >= item.cost) { score -= item.cost; if(item.type==='click') pwr+=item.boost; else rps+=item.boost; item.cost*=1.35; save(); renderShop(); } };
                     container.appendChild(btn);
                 }
             });
         }
 
-        function buyItem(idx) {
-            const item = items[idx];
-            if (score >= item.cost) {
-                score -= item.cost;
-                if (item.type === 'click') pwr += item.boost;
-                else rps += item.boost;
-                item.cost *= 1.35; 
-                save();
-                renderShop();
-            }
-        }
-
         function attemptRebirth() {
             const cost = getRebirthCost();
             if (score >= cost) {
-                if (confirm(`Rebirth for ${Math.pow(2, rebirths + 1)}x Multiplier? (Resets score and upgrades)`)) {
+                document.getElementById('game-bg').classList.add('rebirth-glitch');
+                setTimeout(() => {
                     rebirths++;
-                    score = 0;
-                    pwr = 1;
-                    rps = 0;
-                    // Reset item costs
-                    items.forEach((item, i) => {
-                        item.cost = Math.floor(15 * Math.pow(1.55, i));
-                    });
+                    score = 0; pwr = 1; rps = 0;
+                    items.forEach((item, i) => item.cost = Math.floor(15 * Math.pow(1.55, i)));
                     localStorage.setItem('r_rebirths', rebirths);
-                    save();
-                    renderShop();
-                }
-            } else {
-                alert(`You need ${cost.toLocaleString()} Rede to Rebirth!`);
-            }
+                    document.getElementById('game-bg').classList.remove('rebirth-glitch');
+                    save(); renderShop();
+                }, 1000);
+            } else { alert("Not enough Rede!"); }
         }
 
         function save() {
@@ -214,41 +198,18 @@
             document.getElementById('score').innerText = Math.floor(score).toLocaleString();
             document.getElementById('rps').innerText = `REDE PER SECOND: ${(rps * mult).toFixed(1)}`;
             document.getElementById('click-strength').innerText = `CLICK STRENGTH: ${Math.floor(pwr * mult).toLocaleString()}`;
+            document.getElementById('title-flex').innerText = titles[Math.min(rebirths, titles.length - 1)];
             
-            const rBtn = document.getElementById('rebirth-btn');
-            const rCost = getRebirthCost();
-            rBtn.innerText = `Rebirth (${rebirths})`;
-            document.getElementById('rebirth-cost').innerText = `Cost: ${rCost.toLocaleString()}`;
-            
-            if (score >= rCost) rBtn.classList.add('ready');
-            else rBtn.classList.remove('ready');
+            const rbBtn = document.getElementById('rebirth-btn');
+            rbBtn.innerText = `Rebirth (${rebirths})`;
+            document.getElementById('rebirth-cost').innerText = `Cost: ${getRebirthCost().toLocaleString()}`;
+            if(score >= getRebirthCost()) rbBtn.classList.add('ready');
+            else rbBtn.classList.remove('ready');
         }
 
-        // Main Loop
-        setInterval(() => {
-            if (score > lastSafeScore + 50000000) { // Scaled anti-cheat for high levels
-                score = parseFloat(localStorage.getItem('r_score')) || 0;
-                console.warn("Integrity check reset.");
-            }
-            score += (rps * getMultiplier()) / 10;
-            save();
-            lastSafeScore = score;
-        }, 100);
-
-        setInterval(renderShop, 2000);
-
-        const mascot = document.getElementById('clicker-btn');
-        mascot.onclick = () => {
-            score += (pwr * getMultiplier());
-            save();
-            mascot.classList.remove('spinning');
-            void mascot.offsetWidth;
-            mascot.classList.add('spinning');
-        };
-
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        renderShop();
-        save();
+        setInterval(() => { score += (rps * getMultiplier()) / 10; save(); }, 100);
+        document.getElementById('clicker-btn').onclick = () => { score += (pwr * getMultiplier()); save(); };
+        renderShop(); save();
     </script>
 </body>
 </html>

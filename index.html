@@ -1,30 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Primary Meta Tags -->
     <meta name="title" content="ItsRede | Official Website">
     <meta name="description" content="Official Website for ItsRede. Musical Artist, Author, and Producer. Explore music, games, and merchandise.">
 
-    <!-- Open Graph / Discord & Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://itsrede.uk/">
     <meta property="og:title" content="ItsRede - Welcome to my Official Site!">
     <meta property="og:description" content="Musical Artist, Author, and YouTuber. Home of ItsRede.">
     <meta property="og:image" content="https://itsrede.uk/favicon.png"> 
 
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://itsrede.uk/">
     <meta property="twitter:title" content="ItsRede | Official Website">
     <meta property="twitter:description" content="Musical Artist, Author, and Producer. Home of Rede Records.">
     <meta property="twitter:image" content="https://itsrede.uk/favicon.png">
 
-    <!-- Theme Color for Discord Sidebar -->
     <meta name="theme-color" content="#FF0000">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ItsRede | Official Website</title>
     <link rel="icon" type="image/png" href="favicon.png">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "MusicGroup",
+          "@id": "https://itsrede.uk/#musicgroup",
+          "name": "ItsRede",
+          "url": "https://itsrede.uk/",
+          "logo": "https://itsrede.uk/favicon.png",
+          "image": "https://itsrede.uk/favicon.png",
+          "description": "Professional musical artist, record producer, digital content creator, and author.",
+          "genre": ["Breakcore", "Instrumental", "Electronic"],
+          "sameAs": [
+            "https://www.youtube.com/@itsredeofficial",
+            "https://music.apple.com/us/artist/itsrede/1765371044",
+            "https://www.imdb.com/name/nm17546364/",
+            "https://www.roblox.com/users/1301576775/profile",
+            "https://www.wikidata.org"
+          ],
+          "member": [
+            {
+              "@type": "Organization",
+              "@id": "https://itsrede.uk/#rederecords",
+              "name": "Rede Records",
+              "description": "Independent music distribution network and creative collective."
+            }
+          ],
+          "track": [
+            {
+              "@type": "MusicRecording",
+              "name": "sistint",
+              "inAlbum": "https://itsrede.uk/#discography"
+            },
+            {
+              "@type": "MusicRecording",
+              "name": "downseeking",
+              "inAlbum": "https://itsrede.uk/#discography"
+            },
+            {
+              "@type": "MusicRecording",
+              "name": "Mr litter box",
+              "inAlbum": "https://itsrede.uk/#discography"
+            }
+          ]
+        },
+        {
+          "@type": "Person",
+          "@id": "https://itsrede.uk/#person",
+          "name": "Fred",
+          "alternateName": "ItsRede",
+          "url": "https://itsrede.uk/",
+          "description": "Professional record producer, author, and creator based in Columbus, Ohio.",
+          "jobTitle": ["Musical Artist", "Record Producer", "Author", "Digital Content Creator"],
+          "birthPlace": {
+            "@type": "Place",
+            "name": "Voorhees, New Jersey"
+          },
+          "homeLocation": {
+            "@type": "Place",
+            "name": "Columbus, Ohio"
+          },
+          "sameAs": [
+            "https://www.youtube.com/@itsredeofficial",
+            "https://www.imdb.com/name/nm17546364/"
+          ]
+        },
+        {
+          "@type": "Book",
+          "@id": "https://itsrede.uk/#book1",
+          "name": "Shorts To Success",
+          "headline": "Shorts To Success by ItsRede",
+          "author": {
+            "@id": "https://itsrede.uk/#musicgroup"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Google Play Books"
+          },
+          "bookFormat": "https://schema.org/EBook",
+          "discussionUrl": "https://play.google.com/store/books",
+          "description": "A digital strategy publication focused on content architecture, shorter-form audience retention metrics, and systemic algorithmic scaling."
+        },
+        {
+          "@type": "Book",
+          "@id": "https://itsrede.uk/#book2",
+          "name": "How To Not Be A Larper Online",
+          "headline": "How To Not Be A Larper Online by ItsRede",
+          "author": {
+            "@id": "https://itsrede.uk/#musicgroup"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Google Play Books"
+          },
+          "bookFormat": "https://schema.org/EBook",
+          "discussionUrl": "https://play.google.com/store/books",
+          "description": "A commentary publication covering contemporary digital authentication practices and online subcultures."
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://itsrede.uk/#website",
+          "url": "https://itsrede.uk/",
+          "name": "ItsRede | Official Website",
+          "description": "The verified primary entity home and website for ItsRede.",
+          "publisher": {
+            "@id": "https://itsrede.uk/#musicgroup"
+          }
+        }
+      ]
+    }
+    </script>
     
     <style>
         body {
@@ -124,8 +233,7 @@
 </head>
 <body>
 
-   <!-- Top Left Links -->
-    <div class="top-nav">
+   <div class="top-nav">
         <a href="https://itsrede-shop.fourthwall.com/" class="nav-link">Shop</a>
         <a href="/dvd" class="nav-link">DVD</a>
         <a href="/clicker" class="nav-link">Clicker</a>
@@ -137,7 +245,6 @@
         <h1>ITSREDE</h1>
         <p class="subtitle">Musical Artist • YouTuber • Author • Producer</p>
 
-        <!-- Info / Rede Records Section -->
         <div class="info-box">
             <h3 style="color:red; margin:0 0 10px 0;">Rede Records</h3>
             <p style="font-size: 0.9rem; margin:0;">
@@ -150,7 +257,6 @@
             <a href="mailto:admin@itsrede.uk" class="btn">Contact / Inquiries</a>
         </div>
 
-        <!-- Links Section -->
         <div class="links-section">
             <h2>[Links]</h2>
             <div class="social-links">

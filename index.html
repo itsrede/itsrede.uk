@@ -154,11 +154,19 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Nav Container for Top Left Links */
+        /* Nav Containers for Top Links */
         .top-nav {
             position: absolute;
             top: 20px;
             left: 20px;
+            display: flex;
+            gap: 20px; /* Space between links */
+        }
+
+        .top-nav-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
             display: flex;
             gap: 20px; /* Space between links */
         }
@@ -238,6 +246,11 @@
         <a href="/dvd" class="nav-link">DVD</a>
         <a href="/clicker" class="nav-link">Clicker</a>
         <a href="/discography" class="nav-link">Discography</a>
+    </div>
+
+    <div class="top-nav-right">
+        <a href="/trademark" class="nav-link">Trademark</a>
+        <a href="/legal" class="nav-link">Legal</a>
     </div>
 
     <div class="container">

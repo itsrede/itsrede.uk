@@ -193,7 +193,6 @@
             padding-top: 30px;
         }
 
-        /* Expanded larger preview container */
         .preview-wrapper {
             width: 100%;
             max-width: 720px;
@@ -290,8 +289,14 @@
             </div>
 
             <div class="control-group">
-                <label for="durationNumberInput">Total Duration (Seconds: Up to 60s)</label>
+                <label for="durationNumberInput">Total Duration (Seconds)</label>
                 <input type="number" id="durationNumberInput" min="0.5" max="60" step="0.5" value="3.0">
+            </div>
+
+            <div class="control-group full-width">
+                <label for="delayInput">Start Effect at (Seconds into the GIF)</label>
+                <input type="number" id="delayInput" min="0" max="59" step="0.5" value="0.0">
+                <p style="font-size: 0.7rem; color: #666; margin-top: 4px;">The image stays completely still until this timestamp, then triggers the effect for the remainder.</p>
             </div>
 
             <div class="control-group full-width">
@@ -319,6 +324,7 @@
         
         const frameNumberInput = document.getElementById('frameNumberInput');
         const durationNumberInput = document.getElementById('durationNumberInput');
+        const delayInput = document.getElementById('delayInput');
         const qualityRange = document.getElementById('qualityRange');
         const qualityVal = document.getElementById('qualityVal');
         
@@ -364,7 +370,7 @@
 
             generateBtn.disabled = true;
             generateBtn.textContent = 'Rendering High-Quality Frames...';
-            resultDiv.innerHTML = '<p class="status-text">Processing frames locally in your browser (up to 100 frames)...</p>';
+            resultDiv.innerHTML = '<p class="status-text">Processing frames locally with time offset...</p>';
             
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -384,8 +390,8 @@
             const frames = [];
             const totalFrames = Math.min(Math.max(parseInt(frameNumberInput.value) || 10, 5), 100);
             const totalDuration = Math.min(Math.max(parseFloat(durationNumberInput.value) || 3, 0.5), 60);
+            const startDelay = Math.max(parseFloat(delayInput.value) || 0, 0);
             
-            // Calculate precise individual frame interval in seconds for gifshot
             const frameInterval = parseFloat((totalDuration / totalFrames).toFixed(3));
             const effectMode = document.getElementById('effectType').value;
 
@@ -393,67 +399,77 @@
                 ctx.save();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
-                let progress = i / (totalFrames - 1 || 1);
+                let currentTime = i * frameInterval;
 
-                if (effectMode === 'fade-black') {
-                    ctx.fillStyle = '#000000';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalAlpha = 1 - progress;
+                if (currentTime < startDelay) {
+                    // Before the delay threshold: render clean still image with zero effect progress
                     ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-                } 
-                else if (effectMode === 'fade-white') {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalAlpha = 1 - progress;
-                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-                }
-                else if (effectMode === 'fade-in-black') {
-                    ctx.fillStyle = '#000000';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalAlpha = progress;
-                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-                } 
-                else if (effectMode === 'fade-in-white') {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalAlpha = progress;
-                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-                } 
-                else if (effectMode === 'pulse') {
-                    let scale = 1 + Math.sin(progress * Math.PI * 2) * 0.18;
-                    ctx.translate(canvas.width / 2, canvas.height / 2);
-                    ctx.scale(scale, scale);
-                    ctx.drawImage(uploadedImage, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
-                } 
-                else if (effectMode === 'glitch') {
-                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-                    if (i % 4 === 0) {
-                        ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
-                        ctx.fillRect((Math.random() - 0.5) * 25, 0, canvas.width, canvas.height);
-                    }
-                } 
-                else if (effectMode === 'grayscale') {
-                    ctx.filter = `grayscale(${progress * 100}%)`;
-                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-                } 
-                else if (effectMode === 'blur') {
-                    ctx.filter = `blur(${progress * 16}px)`;
-                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-                }
-                else if (effectMode === 'rgb-split') {
-                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-                    if (i % 2 === 0) {
-                        ctx.globalCompositeOperation = 'screen';
-                        ctx.fillStyle = 'rgba(255,0,0,0.5)';
-                        ctx.fillRect(Math.sin(progress * Math.PI) * 10, 0, canvas.width, canvas.height);
-                    }
-                }
-                else if (effectMode === 'invert') {
-                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-                    if (Math.sin(progress * Math.PI * 4) > 0.5) {
-                        ctx.globalCompositeOperation = 'difference';
-                        ctx.fillStyle = 'white';
+                } else {
+                    // After the delay threshold: scale progress across the remaining window
+                    let activeDuration = Math.max(totalDuration - startDelay, frameInterval);
+                    let activeTime = currentTime - startDelay;
+                    let progress = Math.min(Math.max(activeTime / activeDuration, 0), 1);
+
+                    if (effectMode === 'fade-black') {
+                        ctx.fillStyle = '#000000';
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.globalAlpha = 1 - progress;
+                        ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                    } 
+                    else if (effectMode === 'fade-white') {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.globalAlpha = 1 - progress;
+                        ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                    }
+                    else if (effectMode === 'fade-in-black') {
+                        ctx.fillStyle = '#000000';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.globalAlpha = progress;
+                        ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                    } 
+                    else if (effectMode === 'fade-in-white') {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.globalAlpha = progress;
+                        ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                    } 
+                    else if (effectMode === 'pulse') {
+                        let scale = 1 + Math.sin(progress * Math.PI * 2) * 0.18;
+                        ctx.translate(canvas.width / 2, canvas.height / 2);
+                        ctx.scale(scale, scale);
+                        ctx.drawImage(uploadedImage, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+                    } 
+                    else if (effectMode === 'glitch') {
+                        ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                        if (i % 4 === 0) {
+                            ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+                            ctx.fillRect((Math.random() - 0.5) * 25, 0, canvas.width, canvas.height);
+                        }
+                    } 
+                    else if (effectMode === 'grayscale') {
+                        ctx.filter = `grayscale(${progress * 100}%)`;
+                        ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                    } 
+                    else if (effectMode === 'blur') {
+                        ctx.filter = `blur(${progress * 16}px)`;
+                        ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                    }
+                    else if (effectMode === 'rgb-split') {
+                        ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                        if (i % 2 === 0) {
+                            ctx.globalCompositeOperation = 'screen';
+                            ctx.fillStyle = 'rgba(255,0,0,0.5)';
+                            ctx.fillRect(Math.sin(progress * Math.PI) * 10, 0, canvas.width, canvas.height);
+                        }
+                    }
+                    else if (effectMode === 'invert') {
+                        ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                        if (Math.sin(progress * Math.PI * 4) > 0.5) {
+                            ctx.globalCompositeOperation = 'difference';
+                            ctx.fillStyle = 'white';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        }
                     }
                 }
 
@@ -470,7 +486,7 @@
                 gifWidth: canvas.width,
                 gifHeight: canvas.height
             }, (obj) => {
-                generateBtn.disabled = false;
+                generateBtn.disabled, generateBtn.disabled = false;
                 generateBtn.textContent = 'Generate High-Res GIF';
                 
                 if (!obj.error) {

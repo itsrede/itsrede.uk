@@ -538,8 +538,8 @@
             </div>
 
             <div class="control-group">
-                <label for="frameNumberInput">Total Frames (5 - 100)</label>
-                <input type="number" id="frameNumberInput" min="5" max="100" value="30">
+                <label for="frameNumberInput">Total Frames (5 - 60)</label>
+                <input type="number" id="frameNumberInput" min="5" max="60" value="20">
             </div>
 
             <div class="control-group">
@@ -555,9 +555,9 @@
             <div class="control-group">
                 <div class="range-header">
                     <label for="qualityRange" style="margin-bottom:0;">Resolution Quality Cap</label>
-                    <span id="qualityVal" class="range-value">600px Width</span>
+                    <span id="qualityVal" class="range-value">500px Width</span>
                 </div>
-                <input type="range" id="qualityRange" min="200" max="1000" step="50" value="600">
+                <input type="range" id="qualityRange" min="200" max="800" step="50" value="500">
             </div>
 
             <div class="control-group full-width">
@@ -628,8 +628,8 @@
 
             let errorMsg = "";
 
-            if (isNaN(frames) || frames < 5 || frames > 100) {
-                errorMsg = "ERROR: Total Frames must be between 5 and 100.";
+            if (isNaN(frames) || frames < 5 || frames > 60) {
+                errorMsg = "ERROR: Total Frames must be between 5 and 60 for smooth rendering.";
             } else if (isNaN(duration) || duration <= 0 || duration > 60) {
                 errorMsg = "ERROR: Total Duration must be between 0.5 and 60 seconds.";
             } else if (isNaN(delay) || delay < 0) {
@@ -742,10 +742,9 @@
             if (!validateInputs() || loadedAssets.length === 0) return;
 
             generateBtn.disabled = true;
-            generateBtn.textContent = 'Rendering High-Quality Frames...';
-            resultDiv.innerHTML = '<p class="status-text">Processing frames locally (Optimized GPU context)...</p>';
+            generateBtn.textContent = 'Rendering Frames (Fast Mode)...';
+            resultDiv.innerHTML = '<p class="status-text">Processing optimized frame batch...</p>';
             
-            // Optimized Canvas Context with willReadFrequently
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d', { willReadFrequently: true });
             
@@ -774,10 +773,8 @@
 
             let currentFrameIndex = 0;
 
-            // Non-blocking frame processing loop via requestAnimationFrame
             function processNextFrame() {
                 if (currentFrameIndex >= totalFrames) {
-                    // All frames drawn, send to Gifshot compiler
                     compileGIF();
                     return;
                 }
@@ -900,7 +897,9 @@
                 }
 
                 ctx.restore();
-                frames.push(canvas.toDataURL('image/png'));
+                
+                // PERFORMANCE BOOST: Using JPEG compression instead of heavy PNG strings
+                frames.push(canvas.toDataURL('image/jpeg', 0.85));
 
                 currentFrameIndex++;
                 requestAnimationFrame(processNextFrame);
@@ -933,7 +932,6 @@
                 });
             }
 
-            // Start smooth frame loop
             requestAnimationFrame(processNextFrame);
         });
     </script>

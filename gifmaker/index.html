@@ -743,10 +743,11 @@
 
             generateBtn.disabled = true;
             generateBtn.textContent = 'Rendering High-Quality Frames...';
-            resultDiv.innerHTML = '<p class="status-text">Processing frames locally...</p>';
+            resultDiv.innerHTML = '<p class="status-text">Processing frames locally (Optimized GPU context)...</p>';
             
+            // Optimized Canvas Context with willReadFrequently
             const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
             
             const maxDim = parseInt(qualityRange.value);
             let width = loadedAssets[0].img.width;
@@ -771,18 +772,27 @@
             const captionText = captionInput.value.trim();
             const pos = captionPosition.value;
 
-            for (let i = 0; i < totalFrames; i++) {
+            let currentFrameIndex = 0;
+
+            // Non-blocking frame processing loop via requestAnimationFrame
+            function processNextFrame() {
+                if (currentFrameIndex >= totalFrames) {
+                    // All frames drawn, send to Gifshot compiler
+                    compileGIF();
+                    return;
+                }
+
+                let i = currentFrameIndex;
                 ctx.save();
+                ctx.filter = 'none';
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
                 let currentTime = i * frameInterval;
                 let activeImage;
 
                 if (shouldHold && currentTime < startDelay) {
-                    // Lock onto the very first asset if hold mode is enabled and we are before the delay
                     activeImage = loadedAssets[0].img;
                 } else {
-                    // Normal multi-image sequence progression
                     let currentImgIndex = Math.floor((currentTime / totalDuration) * loadedAssets.length);
                     if (currentImgIndex >= loadedAssets.length) currentImgIndex = loadedAssets.length - 1;
                     activeImage = loadedAssets[currentImgIndex].img;
@@ -841,10 +851,12 @@
                     else if (effectMode === 'grayscale') {
                         ctx.filter = `grayscale(${progress * 100}%)`;
                         ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                        ctx.filter = 'none';
                     } 
                     else if (effectMode === 'blur') {
                         ctx.filter = `blur(${progress * 16}px)`;
                         ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                        ctx.filter = 'none';
                     }
                     else if (effectMode === 'rgb-split') {
                         ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
@@ -889,32 +901,40 @@
 
                 ctx.restore();
                 frames.push(canvas.toDataURL('image/png'));
+
+                currentFrameIndex++;
+                requestAnimationFrame(processNextFrame);
             }
 
-            gifshot.createGIF({
-                images: frames,
-                interval: frameInterval,
-                numFrames: totalFrames,
-                width: canvas.width,
-                height: canvas.height,
-                gifWidth: canvas.width,
-                gifHeight: canvas.height
-            }, (obj) => {
-                generateBtn.disabled = false;
-                generateBtn.textContent = 'Generate High-Res GIF';
-                
-                if (!obj.error) {
-                    resultDiv.innerHTML = `
-                        <div class="preview-wrapper">
-                            <p style="color:#00ffcc; font-weight:bold; margin-bottom:10px;">✓ GIF Compiled Successfully (${canvas.width}x${canvas.height}px, ${loadedAssets.length} Image(s), ${totalFrames} Frames, ${totalDuration}s)</p>
-                            <img src="${obj.image}" alt="High Resolution Generated FX GIF">
-                            <a href="${obj.image}" download="itsrede-pro-fx.gif" class="download-btn">Download High-Res GIF</a>
-                        </div>
-                    `;
-                } else {
-                    resultDiv.innerHTML = '<p class="status-text" style="color:red;">Generation error or memory limit reached. Try lowering resolution or frame count slightly.</p>';
-                }
-            });
+            function compileGIF() {
+                gifshot.createGIF({
+                    images: frames,
+                    interval: frameInterval,
+                    numFrames: totalFrames,
+                    width: canvas.width,
+                    height: canvas.height,
+                    gifWidth: canvas.width,
+                    gifHeight: canvas.height
+                }, (obj) => {
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = 'Generate High-Res GIF';
+                    
+                    if (!obj.error) {
+                        resultDiv.innerHTML = `
+                            <div class="preview-wrapper">
+                                <p style="color:#00ffcc; font-weight:bold; margin-bottom:10px;">✓ GIF Compiled Successfully (${canvas.width}x${canvas.height}px, ${loadedAssets.length} Image(s), ${totalFrames} Frames, ${totalDuration}s)</p>
+                                <img src="${obj.image}" alt="High Resolution Generated FX GIF">
+                                <a href="${obj.image}" download="itsrede-pro-fx.gif" class="download-btn">Download High-Res GIF</a>
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = '<p class="status-text" style="color:red;">Generation error or memory limit reached. Try lowering resolution or frame count slightly.</p>';
+                    }
+                });
+            }
+
+            // Start smooth frame loop
+            requestAnimationFrame(processNextFrame);
         });
     </script>
 </body>

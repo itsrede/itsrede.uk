@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ItsRede GIF Maker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0b0e;
+            --card-bg: #141419;
+            --accent: #ff3b30;
+            --accent-hover: #e02e25;
+            --text-main: #f0f0f5;
+            --text-muted: #8a8a99;
+            --border: #262630;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        .container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid var(--border);
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.5px;
+        }
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            background: #181820;
+            margin-bottom: 1.2rem;
+        }
+        .dropzone.dragover {
+            border-color: var(--accent);
+            background: #201a20;
+        }
+        .dropzone p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .dropzone span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        select, input[type="range"] {
+            width: 100%;
+            margin-top: 0.4rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #1c1c24;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            outline: none;
+        }
+        input[type="range"] {
+            padding: 0;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        .range-value {
+            float: right;
+            color: var(--text-main);
+            font-weight: normal;
+        }
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        button {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 0.85rem;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: var(--accent-hover);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        button:disabled {
+            background: #2c2c38;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+        #result {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 1rem;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 0.75rem;
+            background: #262630;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background 0.2s;
+        }
+        .download-btn:hover {
+            background: #363645;
+        }
+        .status-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>FX GIF Maker</h1>
+        <p class="subtitle">Drag, drop, apply styles, and compile locally.</p>
+        
+        <div class="dropzone" id="dropzone">
+            <p>Drag & drop your photo here or <span id="browseTrigger">browse files</span></p>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+        
+        <label for="effectType">Transition / Effect Mode</label>
+        <select id="effectType">
+            <option value="fade-black">Fade Out to Black</option>
+            <option value="fade-white">Fade Out to White</option>
+            <option value="pulse">Pulse Zoom Loop</option>
+            <option value="glitch">Glitch / Shake Flash</option>
+            <option value="grayscale">Grayscale Fade</option>
+            <option value="blur">Blur Dissolve</option>
+        </select>
+
+        <div class="grid-row">
+            <div>
+                <label for="speedRange">Frame Speed <span id="speedVal" class="range-value">50ms</span></label>
+                <input type="range" id="speedRange" min="20" max="150" step="10" value="50">
+            </div>
+            <div>
+                <label for="frameRange">Frames <span id="frameVal" class="range-value">15</span></label>
+                <input type="range" id="frameRange" min="8" max="30" step="1" value="15">
+            </div>
+        </div>
+
+        <button id="generateBtn" disabled>Generate GIF</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const imageInput = document.getElementById('imageInput');
+        const browseTrigger = document.getElementById('browseTrigger');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultDiv = document.getElementById('result');
+        
+        const speedRange = document.getElementById('speedRange');
+        const speedVal = document.getElementById('speedVal');
+        const frameRange = document.getElementById('frameRange');
+        const frameVal = document.getElementById('frameVal');
+        
+        let uploadedImage = null;
+
+        speedRange.addEventListener('input', (e) => speedVal.textContent = e.target.value + 'ms');
+        frameRange.addEventListener('input', (e) => frameVal.textContent = e.target.value);
+
+        dropzone.addEventListener('click', () => imageInput.click());
+        browseTrigger.addEventListener('click', (e) => { e.stopPropagation(); imageInput.click(); });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); }, false);
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                uploadedImage = new Image();
+                uploadedImage.onload = () => {
+                    generateBtn.disabled = false;
+                    dropzone.innerHTML = `<p style="color:var(--text-main); font-weight:600;">Loaded: ${file.name}</p>`;
+                };
+                uploadedImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        generateBtn.addEventListener('click', () => {
+            if (!uploadedImage) return;
+
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Rendering Frames...';
+            resultDiv.innerHTML = '<p class="status-text">Processing locally...</p>';
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const maxDim = 350;
+            let width = uploadedImage.width;
+            let height = uploadedImage.height;
+            if (width > height) {
+                if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+            } else {
+                if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+            }
+            
+            canvas.width = Math.floor(width);
+            canvas.height = Math.floor(height);
+
+            const frames = [];
+            const totalFrames = parseInt(frameRange.value);
+            const effectMode = document.getElementById('effectType').value;
+            const frameInterval = parseInt(speedRange.value) / 1000;
+
+            for (let i = 0; i <= totalFrames; i++) {
+                ctx.save();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                let progress = i / totalFrames;
+
+                if (effectMode === 'fade-black') {
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.globalAlpha = 1 - progress;
+                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                } 
+                else if (effectMode === 'fade-white') {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.globalAlpha = 1 - progress;
+                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                } 
+                else if (effectMode === 'pulse') {
+                    let scale = 1 + Math.sin(progress * Math.PI * 2) * 0.15;
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.scale(scale, scale);
+                    ctx.drawImage(uploadedImage, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+                } 
+                else if (effectMode === 'glitch') {
+                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                    if (i % 3 === 0) {
+                        ctx.fillStyle = 'rgba(255, 59, 48, 0.3)';
+                        ctx.fillRect((Math.random() - 0.5) * 15, 0, canvas.width, canvas.height);
+                    }
+                } 
+                else if (effectMode === 'grayscale') {
+                    ctx.filter = `grayscale(${progress * 100}%)`;
+                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                } 
+                else if (effectMode === 'blur') {
+                    ctx.filter = `blur(${progress * 12}px)`;
+                    ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                }
+
+                ctx.restore();
+                frames.push(canvas.toDataURL('image/png'));
+            }
+
+            gifshot.createGIF({
+                images: frames,
+                interval: frameInterval,
+                numFrames: totalFrames,
+                width: canvas.width,
+                height: canvas.height
+            }, (obj) => {
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate GIF';
+                
+                if (!obj.error) {
+                    resultDiv.innerHTML = `
+                        <img src="${obj.image}" alt="Generated Effect GIF">
+                        <br>
+                        <a href="${obj.image}" download="itsrede-fx.gif" class="download-btn">Download GIF</a>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<p class="status-text" style="color:var(--accent);">Generation error. Try reducing frames.</p>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

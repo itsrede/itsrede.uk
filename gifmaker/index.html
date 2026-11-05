@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Primary SEO Meta Tags -->
-    <title>ItsRede | Advanced FX GIF Studio & Online GIF Maker</title>
+    <title>ItsRede | Advanced GIF Studio & Online GIF Maker</title>
     <meta name="description" content="Free high-performance, client-side FX GIF Studio by ItsRede. Create custom GIFs, multi-image slideshows, apply transition effects, watermarks, captions, and export high-res animations instantly in your browser.">
     <meta name="keywords" content="ItsRede, GIF Studio, FX GIF Maker, client-side GIF generator, free online GIF maker, breakcore visualizer, custom GIF captions, watermark GIF creator">
     <meta name="author" content="ItsRede">
@@ -539,7 +539,7 @@
 
             <div class="control-group">
                 <label for="frameNumberInput">Total Frames (5 - 60)</label>
-                <input type="number" id="frameNumberInput" min="5" max="60" value="20">
+                <input type="number" id="frameNumberInput" min="5" max="60" value="25">
             </div>
 
             <div class="control-group">
@@ -555,9 +555,9 @@
             <div class="control-group">
                 <div class="range-header">
                     <label for="qualityRange" style="margin-bottom:0;">Resolution Quality Cap</label>
-                    <span id="qualityVal" class="range-value">500px Width</span>
+                    <span id="qualityVal" class="range-value">600px Width</span>
                 </div>
-                <input type="range" id="qualityRange" min="200" max="800" step="50" value="500">
+                <input type="range" id="qualityRange" min="200" max="800" step="50" value="600">
             </div>
 
             <div class="control-group full-width">
@@ -612,11 +612,9 @@
 
         themeToggleBtn.addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
-            if (document.body.classList.contains('light-mode')) {
-                themeToggleBtn.textContent = '🌙 Switch to Dark Mode';
-            } else {
-                themeToggleBtn.textContent = '☀️ Switch to Light Mode';
-            }
+            themeToggleBtn.textContent = document.body.classList.contains('light-mode') 
+                ? '🌙 Switch to Dark Mode' 
+                : '☀️ Switch to Light Mode';
         });
 
         qualityRange.addEventListener('input', (e) => qualityVal.textContent = e.target.value + 'px Width');
@@ -629,7 +627,7 @@
             let errorMsg = "";
 
             if (isNaN(frames) || frames < 5 || frames > 60) {
-                errorMsg = "ERROR: Total Frames must be between 5 and 60 for smooth rendering.";
+                errorMsg = "ERROR: Total Frames must be between 5 and 60.";
             } else if (isNaN(duration) || duration <= 0 || duration > 60) {
                 errorMsg = "ERROR: Total Duration must be between 0.5 and 60 seconds.";
             } else if (isNaN(delay) || delay < 0) {
@@ -645,9 +643,7 @@
                 return false;
             } else {
                 errorBanner.style.display = 'none';
-                if (loadedAssets.length > 0) {
-                    generateBtn.disabled = false;
-                }
+                if (loadedAssets.length > 0) generateBtn.disabled = false;
                 return true;
             }
         }
@@ -683,12 +679,11 @@
                 reader.onload = (event) => {
                     const img = new Image();
                     img.onload = () => {
-                        const assetObj = {
+                        loadedAssets.push({
                             id: Date.now() + Math.random(),
                             file: file,
                             img: img
-                        };
-                        loadedAssets.push(assetObj);
+                        });
                         renderFileList();
                         validateInputs();
                     };
@@ -742,8 +737,8 @@
             if (!validateInputs() || loadedAssets.length === 0) return;
 
             generateBtn.disabled = true;
-            generateBtn.textContent = 'Rendering Frames (Fast Mode)...';
-            resultDiv.innerHTML = '<p class="status-text">Processing optimized frame batch...</p>';
+            generateBtn.textContent = 'Rendering Frames (Full Color)...';
+            resultDiv.innerHTML = '<p class="status-text">Processing color frames locally...</p>';
             
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -898,8 +893,8 @@
 
                 ctx.restore();
                 
-                // PERFORMANCE BOOST: Using JPEG compression instead of heavy PNG strings
-                frames.push(canvas.toDataURL('image/jpeg', 0.85));
+                // Full PNG encoding ensures gifshot keeps 24-bit color depth intact
+                frames.push(canvas.toDataURL('image/png'));
 
                 currentFrameIndex++;
                 requestAnimationFrame(processNextFrame);

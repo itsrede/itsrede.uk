@@ -295,6 +295,33 @@
             font-weight: bold;
         }
 
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--item-bg);
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-red);
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+            color: var(--text-main);
+            font-size: 0.85rem;
+        }
+
         #errorBanner {
             display: none;
             background: rgba(255, 0, 0, 0.15);
@@ -532,6 +559,13 @@
                 </div>
                 <input type="range" id="qualityRange" min="200" max="1000" step="50" value="600">
             </div>
+
+            <div class="control-group full-width">
+                <div class="checkbox-group" onclick="document.getElementById('holdFrameToggle').click(); event.stopPropagation();">
+                    <input type="checkbox" id="holdFrameToggle" checked>
+                    <label for="holdFrameToggle">Hold initial image static until effect delay starts</label>
+                </div>
+            </div>
         </div>
 
         <div id="errorBanner"></div>
@@ -564,6 +598,7 @@
         const errorBanner = document.getElementById('errorBanner');
         const resultDiv = document.getElementById('result');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const holdFrameToggle = document.getElementById('holdFrameToggle');
         
         const captionInput = document.getElementById('captionInput');
         const captionPosition = document.getElementById('captionPosition');
@@ -729,6 +764,7 @@
             const totalFrames = parseInt(frameNumberInput.value);
             const totalDuration = parseFloat(durationNumberInput.value);
             const startDelay = parseFloat(delayInput.value);
+            const shouldHold = holdFrameToggle.checked;
             
             const frameInterval = parseFloat((totalDuration / totalFrames).toFixed(3));
             const effectMode = document.getElementById('effectType').value;
@@ -740,9 +776,17 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
                 let currentTime = i * frameInterval;
-                let currentImgIndex = Math.floor((currentTime / totalDuration) * loadedAssets.length);
-                if (currentImgIndex >= loadedAssets.length) currentImgIndex = loadedAssets.length - 1;
-                let activeImage = loadedAssets[currentImgIndex].img;
+                let activeImage;
+
+                if (shouldHold && currentTime < startDelay) {
+                    // Lock onto the very first asset if hold mode is enabled and we are before the delay
+                    activeImage = loadedAssets[0].img;
+                } else {
+                    // Normal multi-image sequence progression
+                    let currentImgIndex = Math.floor((currentTime / totalDuration) * loadedAssets.length);
+                    if (currentImgIndex >= loadedAssets.length) currentImgIndex = loadedAssets.length - 1;
+                    activeImage = loadedAssets[currentImgIndex].img;
+                }
 
                 if (currentTime < startDelay) {
                     ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
@@ -764,7 +808,6 @@
                         ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
                     }
                     else if (effectMode === 'white-fade-out-hd') {
-                        // High-Definition full canvas white overlay wash
                         ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
                         ctx.fillStyle = '#ffffff';
                         ctx.globalAlpha = progress;

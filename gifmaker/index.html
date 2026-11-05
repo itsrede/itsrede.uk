@@ -3,201 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ItsRede GIF Maker</title>
+    <title>ItsRede | FX GIF Maker</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
     <style>
-        :root {
-            --card-bg: rgba(20, 20, 25, 0.85);
-            --accent: #ff3b30;
-            --accent-hover: #e02e25;
-            --text-main: #f0f0f5;
-            --text-muted: #8a8a99;
-            --border: rgba(38, 38, 48, 0.8);
-        }
-        @keyframes gradientBackground {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(-45deg, #0b0b0e, #141419, #1c1c24, #0b0b0e);
+            margin: 0;
+            padding: 80px 20px;
+            font-family: 'Helvetica', sans-serif;
+            color: white;
+            line-height: 1.8;
+            background: linear-gradient(-45deg, #000000, #1a0000, #0a001a, #000000);
             background-size: 400% 400%;
-            animation: gradientBackground 15s ease infinite;
-            color: var(--text-main);
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 1.5rem;
-            box-sizing: border-box;
         }
-        .container {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container { 
+            max-width: 600px; 
             width: 100%;
-            max-width: 480px;
-            border: 1px solid var(--border);
+            margin: auto; 
+            background: rgba(0,0,0,0.75); 
+            padding: 40px; 
+            border-radius: 20px; 
+            backdrop-filter: blur(12px); 
+            border: 1px solid #333; 
             box-sizing: border-box;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.8);
         }
-        .nav-back {
-            display: inline-block;
-            margin-bottom: 1.2rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: color 0.2s;
+
+        h1 { 
+            font-size: 2.2rem; 
+            color: red; 
+            margin-bottom: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            text-align: center; 
         }
-        .nav-back:hover {
-            color: var(--accent);
+
+        p.subtitle { 
+            text-align: center; 
+            color: #888; 
+            font-size: 1rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        h1 {
-            font-size: 1.4rem;
-            margin-top: 0;
-            margin-bottom: 0.3rem;
-            letter-spacing: -0.5px;
-        }
-        p.subtitle {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-bottom: 1.5rem;
-        }
+
         .dropzone {
-            border: 2px dashed var(--border);
+            border: 2px dashed #400;
             border-radius: 12px;
-            padding: 2rem 1rem;
+            padding: 2.5rem 1rem;
             text-align: center;
             cursor: pointer;
             transition: border-color 0.2s, background 0.2s;
-            background: rgba(24, 24, 32, 0.6);
-            margin-bottom: 1.2rem;
+            background: rgba(255,0,0,0.05);
+            margin-bottom: 25px;
         }
+
         .dropzone.dragover {
-            border-color: var(--accent);
-            background: rgba(32, 26, 32, 0.8);
+            border-color: red;
+            background: rgba(255,0,0,0.15);
         }
+
         .dropzone p {
             margin: 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
+            color: #aaa;
+            font-size: 1rem;
         }
+
         .dropzone span {
-            color: var(--accent);
-            font-weight: 600;
+            color: red;
+            font-weight: bold;
         }
+
         input[type="file"] {
             display: none;
         }
+
         label {
             display: block;
             text-align: left;
-            margin-top: 1rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 600;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #888;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
+
         select, input[type="range"] {
             width: 100%;
-            margin-top: 0.4rem;
-            padding: 0.75rem;
+            margin-top: 8px;
+            padding: 12px;
             border-radius: 8px;
-            border: 1px solid var(--border);
-            background: rgba(28, 28, 36, 0.9);
-            color: var(--text-main);
-            font-size: 0.95rem;
+            border: 1px solid #400;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 1rem;
             box-sizing: border-box;
             outline: none;
         }
+
+        select:focus, input[type="range"]:focus {
+            border-color: red;
+        }
+
         input[type="range"] {
             padding: 0;
-            accent-color: var(--accent);
+            accent-color: red;
             cursor: pointer;
+            height: 6px;
+            background: #222;
         }
+
         .range-value {
             float: right;
-            color: var(--text-main);
-            font-weight: normal;
+            color: red;
+            font-weight: bold;
         }
+
         .grid-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 20px;
         }
+
         button {
             width: 100%;
-            margin-top: 1.5rem;
-            padding: 0.85rem;
-            border-radius: 8px;
-            border: none;
-            background: var(--accent);
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #600;
+            background: red;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: 0.3s;
         }
+
         button:hover {
-            background: var(--accent-hover);
+            background: #cc0000;
+            border-color: red;
+            box-shadow: 0 0 15px rgba(255,0,0,0.4);
         }
+
         button:active {
             transform: scale(0.98);
         }
+
         button:disabled {
-            background: #2c2c38;
-            color: var(--text-muted);
+            background: #222;
+            border-color: #333;
+            color: #555;
             cursor: not-allowed;
+            box-shadow: none;
         }
+
         #result {
-            margin-top: 1.5rem;
+            margin-top: 30px;
             text-align: center;
         }
+
         img {
             max-width: 100%;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            margin-top: 1rem;
+            border-radius: 10px;
+            border: 1px solid #400;
+            margin-top: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
         }
+
         .download-btn {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 0.75rem;
-            background: rgba(38, 38, 48, 0.9);
-            color: #fff;
+            display: block;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255,0,0,0.1);
+            color: white;
             text-decoration: none;
             border-radius: 8px;
-            font-weight: 600;
-            width: 100%;
+            border: 1px solid #400;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
             box-sizing: border-box;
-            transition: background 0.2s;
+            text-align: center;
         }
+
         .download-btn:hover {
-            background: rgba(54, 54, 69, 0.9);
+            background: red;
+            border-color: red;
         }
+
         .status-text {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 1rem;
+            color: #888;
+            font-size: 0.95rem;
+            margin-top: 15px;
+            font-style: italic;
         }
+
+        .back-home { 
+            display: block; 
+            text-align: center; 
+            margin-top: 40px; 
+            color: #666; 
+            text-decoration: none; 
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s; 
+        }
+        .back-home:hover { color: white; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <a href="/" class="nav-back">← Back to itsrede.uk</a>
         <h1>FX GIF Maker</h1>
-        <p class="subtitle">Drag, drop, apply styles, and compile locally.</p>
+        <p class="subtitle">Client-Side Custom Animation Studio</p>
         
         <div class="dropzone" id="dropzone">
-            <p>Drag & drop your photo here or <span id="browseTrigger">browse files</span></p>
+            <p>Drag & drop your image here or <span id="browseTrigger">browse files</span></p>
             <input type="file" id="imageInput" accept="image/*">
         </div>
         
@@ -225,6 +265,8 @@
         <button id="generateBtn" disabled>Generate GIF</button>
         
         <div id="result"></div>
+
+        <a href="/" class="back-home">Return to Home</a>
     </div>
 
     <script>
@@ -270,7 +312,7 @@
                 uploadedImage = new Image();
                 uploadedImage.onload = () => {
                     generateBtn.disabled = false;
-                    dropzone.innerHTML = `<p style="color:var(--text-main); font-weight:600;">Loaded: ${file.name}</p>`;
+                    dropzone.innerHTML = `<p style="color:white; font-weight:bold;">Loaded: ${file.name}</p>`;
                 };
                 uploadedImage.src = event.target.result;
             };
@@ -282,7 +324,7 @@
 
             generateBtn.disabled = true;
             generateBtn.textContent = 'Rendering Frames...';
-            resultDiv.innerHTML = '<p class="status-text">Processing locally...</p>';
+            resultDiv.innerHTML = '<p class="status-text">Processing locally in browser...</p>';
             
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -293,7 +335,7 @@
             if (width > height) {
                 if (width > maxDim) { height *= maxDim / width; width = maxDim; }
             } else {
-                if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                if (height > maxDim) { width *= maxDim / height; height = height; width = maxDim * (width / height); } // Safe aspect scale
             }
             
             canvas.width = Math.floor(width);
@@ -322,7 +364,7 @@
                     ctx.globalAlpha = 1 - progress;
                     ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
                 } 
-                else if (effectMode::equals || effectMode === 'pulse') {
+                else if (effectMode === 'pulse') {
                     let scale = 1 + Math.sin(progress * Math.PI * 2) * 0.15;
                     ctx.translate(canvas.width / 2, canvas.height / 2);
                     ctx.scale(scale, scale);
@@ -331,7 +373,7 @@
                 else if (effectMode === 'glitch') {
                     ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
                     if (i % 3 === 0) {
-                        ctx.fillStyle = 'rgba(255, 59, 48, 0.3)';
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
                         ctx.fillRect((Math.random() - 0.5) * 15, 0, canvas.width, canvas.height);
                     }
                 } 
@@ -361,11 +403,10 @@
                 if (!obj.error) {
                     resultDiv.innerHTML = `
                         <img src="${obj.image}" alt="Generated Effect GIF">
-                        <br>
                         <a href="${obj.image}" download="itsrede-fx.gif" class="download-btn">Download GIF</a>
                     `;
                 } else {
-                    resultDiv.innerHTML = '<p class="status-text" style="color:var(--accent);">Generation error. Try reducing frames.</p>';
+                    resultDiv.innerHTML = '<p class="status-text" style="color:red;">Generation error. Try reducing frame count.</p>';
                 }
             });
         });

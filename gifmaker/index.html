@@ -484,6 +484,7 @@
                 <select id="effectType">
                     <option value="fade-black">Fade Out to Black</option>
                     <option value="fade-white">Fade Out to White</option>
+                    <option value="white-fade-out-hd">White Fade Out (HD)</option>
                     <option value="fade-in-black">Fade In from Black</option>
                     <option value="fade-in-white">Fade In from White</option>
                     <option value="pulse">Pulse Zoom Loop</option>
@@ -572,9 +573,8 @@
         const qualityRange = document.getElementById('qualityRange');
         const qualityVal = document.getElementById('qualityVal');
         
-        let loadedAssets = []; // Stores objects: { file: File, img: Image, id: number }
+        let loadedAssets = [];
 
-        // Theme Toggle Logic
         themeToggleBtn.addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
             if (document.body.classList.contains('light-mode')) {
@@ -685,7 +685,6 @@
                 fileListContainer.appendChild(itemDiv);
             });
 
-            // Attach event listener for X delete buttons
             document.querySelectorAll('.remove-file-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const idToRemove = parseFloat(e.target.getAttribute('data-id'));
@@ -763,6 +762,13 @@
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
                         ctx.globalAlpha = 1 - progress;
                         ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                    }
+                    else if (effectMode === 'white-fade-out-hd') {
+                        // High-Definition full canvas white overlay wash
+                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.globalAlpha = progress;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
                     }
                     else if (effectMode === 'fade-in-black') {
                         ctx.fillStyle = '#000000';

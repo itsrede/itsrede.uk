@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Primary SEO Meta Tags -->
-    <title>ItsRede | Advanced GIF Studio & Online GIF Maker</title>
+    <title>ItsRede | Advanced FX GIF Studio & Online GIF Maker</title>
     <meta name="description" content="Free high-performance, client-side FX GIF Studio by ItsRede. Create custom GIFs, multi-image slideshows, apply transition effects, watermarks, captions, and export high-res animations instantly in your browser.">
     <meta name="keywords" content="ItsRede, GIF Studio, FX GIF Maker, client-side GIF generator, free online GIF maker, breakcore visualizer, custom GIF captions, watermark GIF creator">
     <meta name="author" content="ItsRede">
@@ -395,7 +395,9 @@
         .preview-wrapper {
             width: 100%;
             max-width: 720px;
-            margin: 0 auto;
+            margin: 0 auto 30px auto;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 25px;
         }
 
         img {
@@ -561,9 +563,13 @@
             </div>
 
             <div class="control-group full-width">
+                <div class="checkbox-group" onclick="document.getElementById('batchModeToggle').click(); event.stopPropagation();" style="margin-bottom: 10px;">
+                    <input type="checkbox" id="batchModeToggle" checked>
+                    <label for="batchModeToggle"><b>Batch Mode:</b> Process each image into its own separate GIF</label>
+                </div>
                 <div class="checkbox-group" onclick="document.getElementById('holdFrameToggle').click(); event.stopPropagation();">
                     <input type="checkbox" id="holdFrameToggle" checked>
-                    <label for="holdFrameToggle">Hold initial image static until effect delay starts</label>
+                    <label for="holdFrameToggle">Hold initial frame static until effect delay starts</label>
                 </div>
             </div>
         </div>
@@ -572,7 +578,7 @@
 
         <div class="action-row">
             <button id="resetAssetsBtn" class="secondary-btn" style="display:none;">Clear All Assets</button>
-            <button id="generateBtn" disabled>Generate High-Res GIF</button>
+            <button id="generateBtn" disabled>Generate High-Res GIF(s)</button>
         </div>
         
         <div id="result"></div>
@@ -599,6 +605,7 @@
         const resultDiv = document.getElementById('result');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         const holdFrameToggle = document.getElementById('holdFrameToggle');
+        const batchModeToggle = document.getElementById('batchModeToggle');
         
         const captionInput = document.getElementById('captionInput');
         const captionPosition = document.getElementById('captionPosition');
@@ -737,170 +744,198 @@
             if (!validateInputs() || loadedAssets.length === 0) return;
 
             generateBtn.disabled = true;
-            generateBtn.textContent = 'Rendering Frames (Full Color)...';
-            resultDiv.innerHTML = '<p class="status-text">Processing color frames locally...</p>';
+            resultDiv.innerHTML = '';
             
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            
+            const isBatch = batchModeToggle.checked;
             const maxDim = parseInt(qualityRange.value);
-            let width = loadedAssets[0].img.width;
-            let height = loadedAssets[0].img.height;
-            if (width > height) {
-                if (width > maxDim) { height *= maxDim / width; width = maxDim; }
-            } else {
-                if (height > maxDim) { width *= maxDim / height; height = maxDim; }
-            }
-            
-            canvas.width = Math.floor(width);
-            canvas.height = Math.floor(height);
-
-            const frames = [];
             const totalFrames = parseInt(frameNumberInput.value);
             const totalDuration = parseFloat(durationNumberInput.value);
             const startDelay = parseFloat(delayInput.value);
             const shouldHold = holdFrameToggle.checked;
-            
             const frameInterval = parseFloat((totalDuration / totalFrames).toFixed(3));
             const effectMode = document.getElementById('effectType').value;
             const captionText = captionInput.value.trim();
             const pos = captionPosition.value;
 
-            let currentFrameIndex = 0;
+            // Determine assets to process
+            let assetsToProcess = isBatch ? loadedAssets : [null]; // null represents combined mode
+            let currentAssetIdx = 0;
 
-            function processNextFrame() {
-                if (currentFrameIndex >= totalFrames) {
-                    compileGIF();
+            function processNextAssetTarget() {
+                if (currentAssetIdx >= assetsToProcess.length) {
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = 'Generate High-Res GIF(s)';
                     return;
                 }
 
-                let i = currentFrameIndex;
-                ctx.save();
-                ctx.filter = 'none';
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let targetAsset = assetsToProcess[currentAssetIdx];
+                let currentImageName = targetAsset ? targetAsset.file.name : "combined-sequence";
                 
-                let currentTime = i * frameInterval;
-                let activeImage;
+                generateBtn.textContent = `Processing ${currentAssetIdx + 1} of ${assetsToProcess.length}...`;
+                let statusP = document.createElement('p');
+                statusP.className = 'status-text';
+                statusP.style.color = '#00ffcc';
+                statusP.textContent = `Rendering frames for: ${currentImageName}...`;
+                resultDiv.appendChild(statusP);
 
-                if (shouldHold && currentTime < startDelay) {
-                    activeImage = loadedAssets[0].img;
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                
+                let sampleImg = isBatch ? targetAsset.img : loadedAssets[0].img;
+                let width = sampleImg.width;
+                let height = sampleImg.height;
+                if (width > height) {
+                    if (width > maxDim) { height *= maxDim / width; width = maxDim; }
                 } else {
-                    let currentImgIndex = Math.floor((currentTime / totalDuration) * loadedAssets.length);
-                    if (currentImgIndex >= loadedAssets.length) currentImgIndex = loadedAssets.length - 1;
-                    activeImage = loadedAssets[currentImgIndex].img;
+                    if (height > maxDim) { width *= maxDim / height; height = maxDim; }
                 }
+                
+                canvas.width = Math.floor(width);
+                canvas.height = Math.floor(height);
 
-                if (currentTime < startDelay) {
-                    ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                } else {
-                    let activeDuration = Math.max(totalDuration - startDelay, frameInterval);
-                    let activeTime = currentTime - startDelay;
-                    let progress = Math.min(Math.max(activeTime / activeDuration, 0), 1);
+                const frames = [];
+                let currentFrameIndex = 0;
 
-                    if (effectMode === 'fade-black') {
-                        ctx.fillStyle = '#000000';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        ctx.globalAlpha = 1 - progress;
-                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                    } 
-                    else if (effectMode === 'fade-white') {
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        ctx.globalAlpha = 1 - progress;
-                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                function renderSingleFrame() {
+                    if (currentFrameIndex >= totalFrames) {
+                        compileSingleGIF(canvas, frames, currentImageName, targetAsset);
+                        return;
                     }
-                    else if (effectMode === 'white-fade-out-hd') {
-                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                        ctx.fillStyle = '#ffffff';
-                        ctx.globalAlpha = progress;
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    }
-                    else if (effectMode === 'fade-in-black') {
-                        ctx.fillStyle = '#000000';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        ctx.globalAlpha = progress;
-                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                    } 
-                    else if (effectMode === 'fade-in-white') {
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        ctx.globalAlpha = progress;
-                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                    } 
-                    else if (effectMode === 'pulse') {
-                        let scale = 1 + Math.sin(progress * Math.PI * 2) * 0.18;
-                        ctx.translate(canvas.width / 2, canvas.height / 2);
-                        ctx.scale(scale, scale);
-                        ctx.drawImage(activeImage, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
-                    } 
-                    else if (effectMode === 'glitch') {
-                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                        if (i % 4 === 0) {
-                            ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
-                            ctx.fillRect((Math.random() - 0.5) * 25, 0, canvas.width, canvas.height);
-                        }
-                    } 
-                    else if (effectMode === 'grayscale') {
-                        ctx.filter = `grayscale(${progress * 100}%)`;
-                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                        ctx.filter = 'none';
-                    } 
-                    else if (effectMode === 'blur') {
-                        ctx.filter = `blur(${progress * 16}px)`;
-                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                        ctx.filter = 'none';
-                    }
-                    else if (effectMode === 'rgb-split') {
-                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                        if (i % 2 === 0) {
-                            ctx.globalCompositeOperation = 'screen';
-                            ctx.fillStyle = 'rgba(255,0,0,0.5)';
-                            ctx.fillRect(Math.sin(progress * Math.PI) * 10, 0, canvas.width, canvas.height);
+
+                    let i = currentFrameIndex;
+                    ctx.save();
+                    ctx.filter = 'none';
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    let currentTime = i * frameInterval;
+                    let activeImage;
+
+                    if (isBatch) {
+                        activeImage = targetAsset.img;
+                    } else {
+                        if (shouldHold && currentTime < startDelay) {
+                            activeImage = loadedAssets[0].img;
+                        } else {
+                            let currentImgIndex = Math.floor((currentTime / totalDuration) * loadedAssets.length);
+                            if (currentImgIndex >= loadedAssets.length) currentImgIndex = loadedAssets.length - 1;
+                            activeImage = loadedAssets[currentImgIndex].img;
                         }
                     }
-                    else if (effectMode === 'invert') {
+
+                    if (currentTime < startDelay && isBatch && shouldHold) {
                         ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
-                        if (Math.sin(progress * Math.PI * 4) > 0.5) {
-                            ctx.globalCompositeOperation = 'difference';
-                            ctx.fillStyle = 'white';
+                    } else if (currentTime < startDelay && !isBatch) {
+                        ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                    } else {
+                        let activeDuration = Math.max(totalDuration - startDelay, frameInterval);
+                        let activeTime = currentTime - startDelay;
+                        let progress = Math.min(Math.max(activeTime / activeDuration, 0), 1);
+
+                        if (effectMode === 'fade-black') {
+                            ctx.fillStyle = '#000000';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            ctx.globalAlpha = 1 - progress;
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                        } 
+                        else if (effectMode === 'fade-white') {
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            ctx.globalAlpha = 1 - progress;
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                        }
+                        else if (effectMode === 'white-fade-out-hd') {
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                            ctx.fillStyle = '#ffffff';
+                            ctx.globalAlpha = progress;
                             ctx.fillRect(0, 0, canvas.width, canvas.height);
                         }
+                        else if (effectMode === 'fade-in-black') {
+                            ctx.fillStyle = '#000000';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            ctx.globalAlpha = progress;
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                        } 
+                        else if (effectMode === 'fade-in-white') {
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            ctx.globalAlpha = progress;
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                        } 
+                        else if (effectMode === 'pulse') {
+                            let scale = 1 + Math.sin(progress * Math.PI * 2) * 0.18;
+                            ctx.translate(canvas.width / 2, canvas.height / 2);
+                            ctx.scale(scale, scale);
+                            ctx.drawImage(activeImage, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+                        } 
+                        else if (effectMode === 'glitch') {
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                            if (i % 4 === 0) {
+                                ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+                                ctx.fillRect((Math.random() - 0.5) * 25, 0, canvas.width, canvas.height);
+                            }
+                        } 
+                        else if (effectMode === 'grayscale') {
+                            ctx.filter = `grayscale(${progress * 100}%)`;
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                            ctx.filter = 'none';
+                        } 
+                        else if (effectMode === 'blur') {
+                            ctx.filter = `blur(${progress * 16}px)`;
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                            ctx.filter = 'none';
+                        }
+                        else if (effectMode === 'rgb-split') {
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                            if (i % 2 === 0) {
+                                ctx.globalCompositeOperation = 'screen';
+                                ctx.fillStyle = 'rgba(255,0,0,0.5)';
+                                ctx.fillRect(Math.sin(progress * Math.PI) * 10, 0, canvas.width, canvas.height);
+                            }
+                        }
+                        else if (effectMode === 'invert') {
+                            ctx.drawImage(activeImage, 0, 0, canvas.width, canvas.height);
+                            if (Math.sin(progress * Math.PI * 4) > 0.5) {
+                                ctx.globalCompositeOperation = 'difference';
+                                ctx.fillStyle = 'white';
+                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            }
+                        }
                     }
-                }
 
-                if (captionText) {
+                    if (captionText) {
+                        ctx.restore();
+                        ctx.save();
+                        
+                        let fontSize = Math.max(Math.floor(canvas.width / 20), 16);
+                        ctx.font = `bold ${fontSize}px Helvetica, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        
+                        let x = canvas.width / 2;
+                        let y = canvas.height - 30;
+                        if (pos === 'top') y = 30 + (fontSize / 2);
+                        if (pos === 'center') y = canvas.height / 2;
+
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                        let metrics = ctx.measureText(captionText);
+                        let padding = 12;
+                        ctx.fillRect(x - (metrics.width / 2) - padding, y - (fontSize / 2) - (padding / 2), metrics.width + (padding * 2), fontSize + padding);
+
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillText(captionText, x, y);
+                    }
+
                     ctx.restore();
-                    ctx.save();
-                    
-                    let fontSize = Math.max(Math.floor(canvas.width / 20), 16);
-                    ctx.font = `bold ${fontSize}px Helvetica, sans-serif`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    
-                    let x = canvas.width / 2;
-                    let y = canvas.height - 30;
-                    if (pos === 'top') y = 30 + (fontSize / 2);
-                    if (pos === 'center') y = canvas.height / 2;
+                    frames.push(canvas.toDataURL('image/png'));
 
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-                    let metrics = ctx.measureText(captionText);
-                    let padding = 12;
-                    ctx.fillRect(x - (metrics.width / 2) - padding, y - (fontSize / 2) - (padding / 2), metrics.width + (padding * 2), fontSize + padding);
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillText(captionText, x, y);
+                    currentFrameIndex++;
+                    requestAnimationFrame(renderSingleFrame);
                 }
 
-                ctx.restore();
-                
-                // Full PNG encoding ensures gifshot keeps 24-bit color depth intact
-                frames.push(canvas.toDataURL('image/png'));
-
-                currentFrameIndex++;
-                requestAnimationFrame(processNextFrame);
+                requestAnimationFrame(renderSingleFrame);
             }
 
-            function compileGIF() {
+            function compileSingleGIF(canvas, frames, imageName, targetAsset) {
                 gifshot.createGIF({
                     images: frames,
                     interval: frameInterval,
@@ -910,24 +945,30 @@
                     gifWidth: canvas.width,
                     gifHeight: canvas.height
                 }, (obj) => {
-                    generateBtn.disabled = false;
-                    generateBtn.textContent = 'Generate High-Res GIF';
-                    
+                    statusP.remove();
                     if (!obj.error) {
-                        resultDiv.innerHTML = `
-                            <div class="preview-wrapper">
-                                <p style="color:#00ffcc; font-weight:bold; margin-bottom:10px;">✓ GIF Compiled Successfully (${canvas.width}x${canvas.height}px, ${loadedAssets.length} Image(s), ${totalFrames} Frames, ${totalDuration}s)</p>
-                                <img src="${obj.image}" alt="High Resolution Generated FX GIF">
-                                <a href="${obj.image}" download="itsrede-pro-fx.gif" class="download-btn">Download High-Res GIF</a>
-                            </div>
+                        let safeName = imageName.replace(/\.[^/.]+$/, "");
+                        let wrapper = document.createElement('div');
+                        wrapper.className = 'preview-wrapper';
+                        wrapper.innerHTML = `
+                            <p style="color:#00ffcc; font-weight:bold; margin-bottom:10px;">✓ Compiled: ${imageName} (${canvas.width}x${canvas.height}px)</p>
+                            <img src="${obj.image}" alt="Generated FX GIF">
+                            <a href="${obj.image}" download="itsrede-${safeName}-fx.gif" class="download-btn">Download GIF: ${imageName}</a>
                         `;
+                        resultDiv.appendChild(wrapper);
                     } else {
-                        resultDiv.innerHTML = '<p class="status-text" style="color:red;">Generation error or memory limit reached. Try lowering resolution or frame count slightly.</p>';
+                        let errP = document.createElement('p');
+                        errP.style.color = 'red';
+                        errP.textContent = `Error compiling ${imageName}.`;
+                        resultDiv.appendChild(errP);
                     }
+
+                    currentAssetIdx++;
+                    processNextAssetTarget();
                 });
             }
 
-            requestAnimationFrame(processNextFrame);
+            processNextAssetTarget();
         });
     </script>
 </body>

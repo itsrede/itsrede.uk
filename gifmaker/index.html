@@ -540,8 +540,8 @@
             </div>
 
             <div class="control-group">
-                <label for="frameNumberInput">Total Frames (5 - 60)</label>
-                <input type="number" id="frameNumberInput" min="5" max="60" value="25">
+                <label for="frameNumberInput">Total Frames (5 - 40)</label>
+                <input type="number" id="frameNumberInput" min="5" max="40" value="20">
             </div>
 
             <div class="control-group">
@@ -557,9 +557,9 @@
             <div class="control-group">
                 <div class="range-header">
                     <label for="qualityRange" style="margin-bottom:0;">Resolution Quality Cap</label>
-                    <span id="qualityVal" class="range-value">600px Width</span>
+                    <span id="qualityVal" class="range-value">500px Width</span>
                 </div>
-                <input type="range" id="qualityRange" min="200" max="800" step="50" value="600">
+                <input type="range" id="qualityRange" min="200" max="800" step="50" value="500">
             </div>
 
             <div class="control-group full-width">
@@ -633,8 +633,8 @@
 
             let errorMsg = "";
 
-            if (isNaN(frames) || frames < 5 || frames > 60) {
-                errorMsg = "ERROR: Total Frames must be between 5 and 60.";
+            if (isNaN(frames) || frames < 5 || frames > 40) {
+                errorMsg = "ERROR: Total Frames must be between 5 and 40 for optimal browser performance.";
             } else if (isNaN(duration) || duration <= 0 || duration > 60) {
                 errorMsg = "ERROR: Total Duration must be between 0.5 and 60 seconds.";
             } else if (isNaN(delay) || delay < 0) {
@@ -757,8 +757,7 @@
             const captionText = captionInput.value.trim();
             const pos = captionPosition.value;
 
-            // Determine assets to process
-            let assetsToProcess = isBatch ? loadedAssets : [null]; // null represents combined mode
+            let assetsToProcess = isBatch ? loadedAssets : [null]; 
             let currentAssetIdx = 0;
 
             function processNextAssetTarget() {
@@ -798,7 +797,7 @@
 
                 function renderSingleFrame() {
                     if (currentFrameIndex >= totalFrames) {
-                        compileSingleGIF(canvas, frames, currentImageName, targetAsset);
+                        compileSingleGIF(canvas, frames, currentImageName, statusP);
                         return;
                     }
 
@@ -935,7 +934,7 @@
                 requestAnimationFrame(renderSingleFrame);
             }
 
-            function compileSingleGIF(canvas, frames, imageName, targetAsset) {
+            function compileSingleGIF(canvas, frames, imageName, statusP) {
                 gifshot.createGIF({
                     images: frames,
                     interval: frameInterval,
@@ -959,12 +958,14 @@
                     } else {
                         let errP = document.createElement('p');
                         errP.style.color = 'red';
-                        errP.textContent = `Error compiling ${imageName}.`;
+                        errP.textContent = `Error compiling ${imageName}. Try lowering frame count or resolution.`;
                         resultDiv.appendChild(errP);
                     }
 
                     currentAssetIdx++;
-                    processNextAssetTarget();
+                    
+                    // MEMORY YIELD: Small timeout prevents browser thread locking between batch items
+                    setTimeout(processNextAssetTarget, 150);
                 });
             }
 

@@ -545,6 +545,16 @@
             </div>
 
             <div class="control-group">
+                <label for="customWidthInput">Custom Width (px) - Optional</label>
+                <input type="number" id="customWidthInput" placeholder="Auto (e.g., 400)" min="50" max="2000">
+            </div>
+
+            <div class="control-group">
+                <label for="customHeightInput">Custom Height (px) - Optional</label>
+                <input type="number" id="customHeightInput" placeholder="Auto (e.g., 400)" min="50" max="2000">
+            </div>
+
+            <div class="control-group">
                 <label for="durationNumberInput">Total Duration (Seconds)</label>
                 <input type="number" id="durationNumberInput" min="0.5" max="60" step="0.5" value="3.0">
             </div>
@@ -554,10 +564,10 @@
                 <input type="number" id="delayInput" min="0" max="60" step="0.5" value="0.0">
             </div>
 
-            <div class="control-group">
+            <div class="control-group full-width">
                 <div class="range-header">
-                    <label for="qualityRange" style="margin-bottom:0;">Resolution Quality Cap</label>
-                    <span id="qualityVal" class="range-value">500px Width</span>
+                    <label for="qualityRange" style="margin-bottom:0;">Default Resolution Quality Cap (If custom sizes blank)</label>
+                    <span id="qualityVal" class="range-value">500px Max</span>
                 </div>
                 <input type="range" id="qualityRange" min="200" max="800" step="50" value="500">
             </div>
@@ -614,6 +624,8 @@
         const delayInput = document.getElementById('delayInput');
         const qualityRange = document.getElementById('qualityRange');
         const qualityVal = document.getElementById('qualityVal');
+        const customWidthInput = document.getElementById('customWidthInput');
+        const customHeightInput = document.getElementById('customHeightInput');
         
         let loadedAssets = [];
 
@@ -624,7 +636,7 @@
                 : '☀️ Switch to Light Mode';
         });
 
-        qualityRange.addEventListener('input', (e) => qualityVal.textContent = e.target.value + 'px Width');
+        qualityRange.addEventListener('input', (e) => qualityVal.textContent = e.target.value + 'px Max');
 
         function validateInputs() {
             let frames = parseInt(frameNumberInput.value);
@@ -655,7 +667,7 @@
             }
         }
 
-        [frameNumberInput, durationNumberInput, delayInput].forEach(input => {
+        [frameNumberInput, durationNumberInput, delayInput, customWidthInput, customHeightInput].forEach(input => {
             input.addEventListener('input', validateInputs);
         });
 
@@ -757,6 +769,9 @@
             const captionText = captionInput.value.trim();
             const pos = captionPosition.value;
 
+            const userWidth = parseInt(customWidthInput.value);
+            const userHeight = parseInt(customHeightInput.value);
+
             let assetsToProcess = isBatch ? loadedAssets : [null]; 
             let currentAssetIdx = 0;
 
@@ -783,10 +798,23 @@
                 let sampleImg = isBatch ? targetAsset.img : loadedAssets[0].img;
                 let width = sampleImg.width;
                 let height = sampleImg.height;
-                if (width > height) {
-                    if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+
+                // Calculate Custom or Auto Dimensions
+                if (!isNaN(userWidth) && !isNaN(userHeight)) {
+                    width = userWidth;
+                    height = userHeight;
+                } else if (!isNaN(userWidth)) {
+                    height = (userWidth / width) * height;
+                    width = userWidth;
+                } else if (!isNaN(userHeight)) {
+                    width = (userHeight / height) * width;
+                    height = userHeight;
                 } else {
-                    if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                    if (width > height) {
+                        if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+                    } else {
+                        if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                    }
                 }
                 
                 canvas.width = Math.floor(width);
@@ -965,7 +993,7 @@
                     currentAssetIdx++;
                     
                     // MEMORY YIELD: Small timeout prevents browser thread locking between batch items
-                    setTimeout(processNextAssetTarget, 150);
+                    setTimeout(processNextAssetTarget, 100);
                 });
             }
 
